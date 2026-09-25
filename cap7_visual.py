@@ -10,8 +10,9 @@ Render del lote:
     manim -ql cap7_visual.py
 
 LOTE 1 (orden de la lista): 7.1, 7.3, 7.5, 7.6, 7.9
+LOTE 2 (orden de la lista): 7.11, 7.13, 7.15, 7.16, 7.17
 PENDIENTES cap7:
-    11, 13, 15, 16, 17, 19, 23, 30, 34, 36, 37, 41, 42, 43,
+    19, 23, 30, 34, 36, 37, 41, 42, 43,
     45, 46, 49, 53, 55, 56, 57, 59, 63, 64, 66, 67, 68, 70, 73, 77, 87
 """
 
@@ -351,3 +352,300 @@ class P7_9(Cap7Scene):
         },
     ]
     resultado_latex = r"W_N = 0,\ W_g = 0.98\ \mathrm{J},\ v_B = 2.76\ \mathrm{m/s},\ N = 5.00\ \mathrm{N}"
+
+
+class P7_11(Cap7Scene):
+    numero = "7.11"
+    titulo = "Trabajo de la fricción en un rizo"
+    lista_datos = [
+        ("Masa del carrito:", r"m = 120\ \mathrm{kg}"),
+        ("Radio del rizo:", r"R = 12.0\ \mathrm{m}"),
+        ("Rapidez en A / B:", r"v_A = 25.0,\ v_B = 8.0\ \mathrm{m/s}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        centro = p(0.0, 0.1)
+        radio = 2.1
+        aro = Circle(radius=radio, color=self.BLUE, stroke_width=7).move_to(centro)
+        fig.registrar("aro", aro, lambda m: Create(m))
+        A = centro + DOWN * radio
+        B = centro + UP * radio
+        self.f_cuerpo(fig, "cartA", A, ancho=0.85, alto=0.6,
+                      color=self.BLUE, etiqueta="A")
+        self.f_cuerpo(fig, "cartB", B, ancho=0.85, alto=0.6,
+                      color=self.GREEN, etiqueta="B")
+        self.f_vector(fig, "vA", A, RIGHT, 1.2, color=self.CYAN,
+                      etiqueta=r"25", lado=DOWN, etiqueta_size=20)
+        self.f_vector(fig, "vB", B, LEFT, 0.6, color=self.CYAN,
+                      etiqueta=r"8", lado=UP, etiqueta_size=20)
+        self.f_vector(fig, "fk", A + UP * 0.35, LEFT, 0.9, color=self.YELLOW,
+                      etiqueta=r"f", lado=UP, etiqueta_size=22)
+        self.f_linea(fig, "h", p(2.0, A[1]), p(2.0, B[1]),
+                     color=self.GREEN, grosor=2, discontinuo=True,
+                     etiqueta=r"2R", lado=RIGHT, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El carrito sube del punto A al B",
+            "revelar": ["aro", "cartA", "cartB", "vA", "vB", "h"],
+            "text": ["Gana altura pero pierde más rapidez de la cuenta: hay fricción."],
+        },
+        {
+            "titulo": "Energía mecánica en A y en B",
+            "math": [
+                r"K_A = \tfrac12(120)(25.0)^2 = 37500\ \mathrm{J}",
+                r"K_B + U_B = \tfrac12(120)(8.0)^2 + (120)(9.80)(24.0)",
+                r"= 3840 + 28224 = 32064\ \mathrm{J}",
+            ],
+        },
+        {
+            "titulo": "Lo que falta lo hizo la fricción",
+            "revelar": ["fk"],
+            "math": [r"W_f = 32064 - 37500 = -5436\ \mathrm{J}"],
+            "resaltar": ["fk"],
+        },
+    ]
+    resultado_latex = r"W_f = -5.44\times10^3\ \mathrm{J}"
+
+
+class P7_13(Cap7Scene):
+    numero = "7.13"
+    titulo = "Horno empujado rampa arriba"
+    lista_datos = [
+        ("Masa del horno:", r"m = 10.0\ \mathrm{kg}"),
+        ("Rampa:", r"8.00\ \mathrm{m},\ 36.9^\circ"),
+        ("Empuje paralelo:", r"F = 110\ \mathrm{N}"),
+        ("Fricción cinética:", r"\mu_k = 0.250"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        th = np.deg2rad(36.9)
+        u = np.array([np.cos(th), np.sin(th), 0.0])
+        n = np.array([-np.sin(th), np.cos(th), 0.0])
+        A = p(-3.1, -1.6)
+        B = A + 4.3 * u
+        self.f_linea(fig, "rampa", A, B, color=self.BLUE, grosor=6)
+        self.f_linea(fig, "base", p(A[0], A[1]), p(B[0], A[1]), color=self.MUTED, grosor=3)
+        self.f_angulo(fig, "theta", A, A + u, A + RIGHT, radio=0.6,
+                      etiqueta=r"36.9^\circ", etiqueta_size=20)
+        C = A + 1.1 * u + 0.42 * n
+        g = self.f_cuerpo(fig, "horno", C, ancho=1.2, alto=0.72,
+                          color=self.BLUE, etiqueta="horno")
+        g[0].rotate(th, about_point=C)
+        self.f_vector(fig, "F", C + 0.66 * u, u, 1.15, color=self.RED,
+                      etiqueta=r"F", lado=UP, etiqueta_size=24)
+        self.f_vector(fig, "fk", C - 0.66 * u, -u, 0.8, color=self.YELLOW,
+                      etiqueta=r"f_k", lado=DOWN, etiqueta_size=22)
+        self.f_vector(fig, "w", C, DOWN, 1.0, color=self.ORANGE,
+                      etiqueta=r"mg", lado=RIGHT, etiqueta_size=22)
+        self.f_vector(fig, "N", C, n, 0.9, color=self.CYAN,
+                      etiqueta=r"N", lado=RIGHT, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Empuje paralelo rampa arriba",
+            "revelar": ["rampa", "base", "theta", "horno"],
+            "text": ["Parte del reposo al pie de la rampa."],
+        },
+        {
+            "titulo": "a) Trabajo del empuje",
+            "revelar": ["F"],
+            "math": [r"W_F = Fd = (110)(8.00) = 880\ \mathrm{J}"],
+            "resaltar": ["F"],
+        },
+        {
+            "titulo": "b) Trabajo de la fricción",
+            "revelar": ["fk", "N"],
+            "math": [
+                r"f_k = \mu_k mg\cos 36.9^\circ = 19.6\ \mathrm{N}",
+                r"W_f = -f_k d = -157\ \mathrm{J}",
+            ],
+            "resaltar": ["fk"],
+        },
+        {
+            "titulo": "c) Aumento de energía potencial",
+            "revelar": ["w"],
+            "math": [
+                r"\Delta U = mgd\sin 36.9^\circ",
+                r"\Delta U = (10.0)(9.80)(8.00)(0.600) = 471\ \mathrm{J}",
+            ],
+        },
+        {
+            "titulo": "d) y e) Rapidez arriba (dos caminos)",
+            "math": [
+                r"\Delta K = 880 - 157 - 471 = 253\ \mathrm{J}",
+                r"a = \dfrac{110-19.6-58.8}{10.0} = 3.16\ \mathrm{m/s^2}",
+                r"v = \sqrt{2(3.16)(8.00)} = 7.11\ \mathrm{m/s}",
+            ],
+            "text": ["Energía y Newton coinciden: ΔK = 253 J en ambos."],
+        },
+    ]
+    resultado_latex = r"W_F = 880\ \mathrm{J},\ W_f = -157\ \mathrm{J},\ \Delta U = 471\ \mathrm{J},\ v = 7.11\ \mathrm{m/s}"
+
+
+class P7_15(Cap7Scene):
+    numero = "7.15"
+    titulo = "Energía potencial de un resorte"
+    lista_datos = [
+        ("Fuerza para estirar 0.200 m:", r"F = 800\ \mathrm{N}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+
+        def zig(p0, p1, vueltas=8, amp=0.14):
+            a = np.array(p0, dtype=float)
+            b = np.array(p1, dtype=float)
+            d = b - a
+            u = d / (np.linalg.norm(d) + 1e-9)
+            nn = np.array([-u[1], u[0], 0.0])
+            pts = [a]
+            N = 2 * vueltas
+            for i in range(1, N):
+                pts.append(a + d * (i / N) + nn * (amp if i % 2 else -amp))
+            pts.append(b)
+            return VMobject().set_points_as_corners(pts).set_color("#F4F7FB").set_stroke(width=4)
+
+        fig.registrar("resorte", zig(p(-3.0, 0.3), p(-0.6, 0.3)), lambda m: Create(m))
+        self.f_linea(fig, "pared", p(-3.0, -0.9), p(-3.0, 1.5), color=self.MUTED, grosor=4)
+        self.f_cuerpo(fig, "tope", p(-0.6, 0.3), forma="punto", color=self.YELLOW)
+        self.f_linea(fig, "x1", p(-3.0, -0.5), p(-0.6, -0.5),
+                     color=self.GREEN, grosor=2, discontinuo=False,
+                     etiqueta=r"0.200", lado=DOWN, etiqueta_size=22)
+        self.f_linea(fig, "x2", p(-3.0, -1.1), p(-2.5, -1.1),
+                     color=self.YELLOW, grosor=3,
+                     etiqueta=r"0.05", lado=DOWN, etiqueta_size=20)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Constante del resorte",
+            "revelar": ["pared", "resorte", "tope", "x1"],
+            "math": [r"k = \dfrac{F}{x} = \dfrac{800}{0.200} = 4000\ \mathrm{N/m}"],
+        },
+        {
+            "titulo": "a) Estirado 0.200 m",
+            "math": [
+                r"U = \tfrac12 Fx = \tfrac12(800)(0.200)",
+                r"U = 80.0\ \mathrm{J}",
+            ],
+            "resaltar": ["x1"],
+        },
+        {
+            "titulo": "b) Comprimido 5.00 cm",
+            "revelar": ["x2"],
+            "math": [
+                r"U = \tfrac12 kx^2 = \tfrac12(4000)(0.0500)^2",
+                r"U = 5.00\ \mathrm{J}",
+            ],
+            "resaltar": ["x2"],
+        },
+    ]
+    resultado_latex = r"U_a = 80.0\ \mathrm{J}, \qquad U_b = 5.00\ \mathrm{J}"
+
+
+class P7_16(Cap7Scene):
+    numero = "7.16"
+    titulo = "Constante elástica de un tendón"
+    lista_datos = [
+        ("Masa de prueba:", r"m = 250\ \mathrm{g}"),
+        ("Estiramiento:", r"x = 1.23\ \mathrm{cm}"),
+        ("Tensión máxima:", r"F_{\max} = 138\ \mathrm{N}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "soporte", p(-1.6, 2.1), p(1.6, 2.1), color=self.MUTED, grosor=3)
+        self.f_linea(fig, "tendon", p(0.0, 2.1), p(0.0, 0.3),
+                     color=self.WHITE, grosor=6)
+        self.f_cuerpo(fig, "pesa", p(0.0, -0.05), ancho=0.8, alto=0.6,
+                      color=self.ORANGE, etiqueta="250 g")
+        self.f_linea(fig, "x", p(0.55, 0.9), p(0.55, 0.3),
+                     color=self.GREEN, grosor=2, discontinuo=True,
+                     etiqueta=r"1.23", lado=RIGHT, etiqueta_size=20)
+        self.f_vector(fig, "w", p(0.0, -0.05), DOWN, 0.8, color=self.ORANGE,
+                      etiqueta=r"mg", lado=RIGHT, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El tendón se comporta como resorte",
+            "revelar": ["soporte", "tendon", "pesa", "x", "w"],
+            "text": ["En equilibrio, la tensión iguala al peso que cuelga."],
+        },
+        {
+            "titulo": "a) Constante de fuerza",
+            "math": [
+                r"k = \dfrac{mg}{x} = \dfrac{(0.250)(9.80)}{0.0123}",
+                r"k = 199\ \mathrm{N/m}",
+            ],
+            "resaltar": ["tendon"],
+        },
+        {
+            "titulo": "b) Al límite de rotura",
+            "math": [
+                r"x_{\max} = \dfrac{138}{199} = 0.693\ \mathrm{m}",
+                r"U = \tfrac12(138)(0.693) = 47.8\ \mathrm{J}",
+            ],
+        },
+    ]
+    resultado_latex = r"k = 199\ \mathrm{N/m}, \quad x_{\max} = 0.693\ \mathrm{m}, \quad U = 47.8\ \mathrm{J}"
+
+
+class P7_17(Cap7Scene):
+    numero = "7.17"
+    titulo = "Energía contra estiramiento al cuadrado"
+    lista_datos = [
+        ("Energía de referencia:", r"U_0"),
+        ("Estiramiento de referencia:", r"x_0"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        axes = self.f_grafica(
+            fig, "grafica", [lambda x: x ** 2],
+            x_range=[0, 2.2, 0.5], y_range=[0, 4.5, 1.0],
+            x_label="x", y_label="U", ancho=4.4, alto=3.0, centro=(0.0, -0.2),
+        )
+        for x, y, nombre, et in [(1.0, 1.0, "p0", r"(x_0,U_0)"),
+                                 (2.0, 4.0, "p1", r"(2x_0,4U_0)"),
+                                 (0.5, 0.25, "p2", r"(x_0/2,U_0/4)"),
+                                 (np.sqrt(2), 2.0, "p3", r"(x_0\sqrt2,2U_0)"),
+                                 (np.sqrt(2) / 2, 0.5, "p4", r"(x_0/\sqrt2,U_0/2)")]:
+            pt = axes.c2p(x, y)
+            self.f_cuerpo(fig, nombre, pt, forma="punto", color=self.YELLOW)
+            self.f_texto(fig, "et" + nombre, et, pt + UP * 0.35 + RIGHT * 0.55,
+                         size=20, color=self.YELLOW, math=True)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "U crece con el cuadrado de x",
+            "revelar": ["grafica_ejes", "grafica_c0"],
+            "math": [r"U = \tfrac12 kx^2 \;\Rightarrow\; U = U_0\left(\dfrac{x}{x_0}\right)^2"],
+            "text": ["Duplicar el estiramiento cuadruplica la energía."],
+        },
+        {
+            "titulo": "a) Doble y mitad de distancia",
+            "revelar": ["p1", "etp1", "p2", "etp2"],
+            "math": [
+                r"\text{i. }U(2x_0) = 4U_0",
+                r"\text{ii. }U(x_0/2) = U_0/4",
+            ],
+            "resaltar": ["p1", "p2"],
+        },
+        {
+            "titulo": "b) Doble y mitad de energía",
+            "revelar": ["p3", "etp3", "p4", "etp4"],
+            "math": [
+                r"\text{i. }x = x_0\sqrt{2}",
+                r"\text{ii. }x = x_0/\sqrt{2}",
+            ],
+            "resaltar": ["p3", "p4"],
+        },
+    ]
+    resultado_latex = r"4U_0,\ U_0/4; \qquad x_0\sqrt2,\ x_0/\sqrt2"
