@@ -14,8 +14,8 @@ LOTE 3 (orden de la lista): 6.33, 6.34, 6.35, 6.37, 6.43
 LOTE 4 (orden de la lista): 6.45, 6.46, 6.52, 6.56, 6.60
 LOTE 5 (orden de la lista): 6.61, 6.65, 6.66, 6.69, 6.71
 LOTE 6 (orden de la lista): 6.72, 6.75, 6.76, 6.80, 6.81
-PENDIENTES cap6:
-    84, 85, 87, 94, 97
+LOTE 7 (orden de la lista, final cap6): 6.84, 6.85, 6.87, 6.94, 6.97
+CAPÍTULO 6 COMPLETO (35/35).
 """
 
 import numpy as np
@@ -1770,3 +1770,280 @@ class P6_81(Cap6Scene):
         },
     ]
     resultado_latex = r"d = 1.06\ \mathrm{m}\ \text{desde que se suelta}"
+
+
+class P6_84(Cap6Scene):
+    numero = "6.84"
+    titulo = "Profesor empujado rampa arriba en silla"
+    lista_datos = [
+        ("Masa total:", r"85.0\ \mathrm{kg}"),
+        ("Rampa:", r"2.50\ \mathrm{m},\ 30.0^\circ"),
+        ("Empuje horizontal:", r"F = 600\ \mathrm{N}"),
+        ("Rapidez abajo:", r"v_1 = 2.00\ \mathrm{m/s}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        th = np.deg2rad(30.0)
+        u = np.array([np.cos(th), np.sin(th), 0.0])
+        n = np.array([-np.sin(th), np.cos(th), 0.0])
+        A = p(-3.0, -1.3)
+        B = A + 3.6 * u
+        self.f_linea(fig, "rampa", A, B, color=self.BLUE, grosor=6)
+        self.f_linea(fig, "base", p(A[0], A[1]), p(B[0], A[1]), color=self.MUTED, grosor=3)
+        self.f_angulo(fig, "theta", A, A + u, A + RIGHT, radio=0.6,
+                      etiqueta=r"30^\circ", etiqueta_size=20)
+        C = A + 1.2 * u + 0.5 * n
+        g = self.f_cuerpo(fig, "silla", C, ancho=1.35, alto=0.9,
+                          color=self.BLUE)
+        g[0].rotate(th, about_point=C)
+        self.f_texto(fig, "etSilla", "silla", C + UP * 0.65 + LEFT * 0.85,
+                     size=22, color=self.WHITE)
+        self.f_vector(fig, "F", C + LEFT * 0.68, RIGHT, 1.3, color=self.RED,
+                      etiqueta=r"600", lado=RIGHT, etiqueta_size=22)
+        self.f_vector(fig, "v", C + 0.75 * u, u, 0.9, color=self.CYAN,
+                      etiqueta=r"v", lado=UP, etiqueta_size=22)
+        self.f_vector(fig, "w", C, DOWN, 1.05, color=self.ORANGE,
+                      etiqueta=r"mg", lado=RIGHT, etiqueta_size=22)
+        self.f_vector(fig, "N", C, n, 0.95, color=self.CYAN,
+                      etiqueta=r"N", lado=RIGHT, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Empuje horizontal sobre la rampa",
+            "revelar": ["rampa", "base", "theta", "silla", "etSilla", "v"],
+            "text": ["Solo la componente del empuje a lo largo de la rampa trabaja."],
+        },
+        {
+            "titulo": "Trabajo del empuje y del peso",
+            "revelar": ["F", "w", "N"],
+            "math": [
+                r"W_F = 600(2.50)\cos 30^\circ = 1299\ \mathrm{J}",
+                r"W_g = -85(9.80)(2.50)\sin 30^\circ = -1041\ \mathrm{J}",
+            ],
+            "resaltar": ["F", "w"],
+        },
+        {
+            "titulo": "Rapidez en la parte superior",
+            "math": [
+                r"K_1 = \tfrac12(85.0)(2.00)^2 = 170\ \mathrm{J}",
+                r"K_2 = 170 + 1299 - 1041 = 428\ \mathrm{J}",
+                r"v_2 = \sqrt{2(428)/85.0} = 3.17\ \mathrm{m/s}",
+            ],
+        },
+    ]
+    resultado_latex = r"v_2 = 3.17\ \mathrm{m/s}"
+
+
+class P6_85(Cap6Scene):
+    numero = "6.85"
+    titulo = "Bloque contra un resorte sin fricción"
+    lista_datos = [
+        ("Masa del bloque:", r"m = 5.00\ \mathrm{kg}"),
+        ("Rapidez inicial:", r"v_0 = 6.00\ \mathrm{m/s}"),
+        ("Constante:", r"k = 500\ \mathrm{N/m}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "piso", p(-3.4, -0.4), p(3.0, -0.4), color=self.MUTED, grosor=4)
+        self.f_linea(fig, "pared", p(-3.1, -0.4), p(-3.1, 1.6), color=self.MUTED, grosor=4)
+        fig.registrar("resorte", resorte(p(-3.1, 0.0), p(-1.7, 0.0), vueltas=8),
+                       lambda m: Create(m))
+        self.f_cuerpo(fig, "bloque", p(-0.4, 0.0), ancho=1.15, alto=0.8,
+                      color=self.BLUE, etiqueta="5 kg")
+        self.f_vector(fig, "v0", p(-0.975, 0.0), LEFT, 1.3, color=self.CYAN,
+                      etiqueta=r"v_0", lado=UP, etiqueta_size=24)
+        self.f_linea(fig, "xmax", p(-1.7, -0.4), p(-1.7, -1.0),
+                     color=self.YELLOW, grosor=2, discontinuo=True,
+                     etiqueta=r"x_{\max}", lado=DOWN, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El bloque choca contra el resorte",
+            "revelar": ["piso", "pared", "resorte", "bloque", "v0"],
+            "text": ["Sin fricción: toda la energía cinética se guarda en el resorte."],
+        },
+        {
+            "titulo": "a) Compresión máxima",
+            "revelar": ["xmax"],
+            "math": [
+                r"\tfrac12 mv_0^2 = \tfrac12 kx_{\max}^2",
+                r"x_{\max} = v_0\sqrt{\dfrac{m}{k}} = 6.00\sqrt{\dfrac{5.00}{500}}",
+                r"x_{\max} = 0.600\ \mathrm{m}",
+            ],
+            "resaltar": ["xmax"],
+        },
+        {
+            "titulo": "b) Si x no pasa de 0.150 m",
+            "math": [
+                r"v_0 = x\sqrt{\dfrac{k}{m}} = 0.150\sqrt{\dfrac{500}{5.00}}",
+                r"v_0 = 1.50\ \mathrm{m/s}",
+            ],
+        },
+    ]
+    resultado_latex = r"x_{\max} = 0.600\ \mathrm{m}, \qquad v_{0,\max} = 1.50\ \mathrm{m/s}"
+
+
+class P6_87(Cap6Scene):
+    numero = "6.87"
+    titulo = "Sistema que se detiene por fricción"
+    lista_datos = [
+        ("Bloque en la mesa:", r"8.00\ \mathrm{kg}"),
+        ("Bloque colgante:", r"6.00\ \mathrm{kg}"),
+        ("Rapidez inicial:", r"0.900\ \mathrm{m/s}"),
+        ("Distancia hasta parar:", r"2.00\ \mathrm{m}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "mesa", p(-3.2, 0.0), p(1.4, 0.0), color=self.MUTED, grosor=4)
+        self.f_cuerpo(fig, "bloque8", p(-1.7, 0.42), ancho=1.15, alto=0.72,
+                      color=self.BLUE)
+        self.f_texto(fig, "et8", "8 kg", (-1.7, 1.05, 0), size=22, color=self.WHITE)
+        self.f_polea(fig, "polea", p(1.4, 0.42), radio=0.32, color=self.BLUE)
+        self.f_linea(fig, "cuerdaH", p(-1.1, 0.42), p(1.08, 0.42), color=self.WHITE, grosor=5)
+        self.f_linea(fig, "cuerdaV", p(1.4, 0.1), p(1.4, -0.45), color=self.WHITE, grosor=5)
+        self.f_cuerpo(fig, "bloque6", p(1.4, -0.8), ancho=0.85, alto=0.6,
+                      color=self.GREEN)
+        self.f_texto(fig, "et6", "6 kg", (0.62, -0.8, 0), size=22, color=self.WHITE)
+        self.f_vector(fig, "v8", p(-1.7, 0.42), RIGHT, 0.9, color=self.CYAN,
+                      etiqueta=r"v_0", lado=DOWN, etiqueta_size=22)
+        self.f_vector(fig, "v6", p(1.4, -0.8), DOWN, 0.8, color=self.CYAN,
+                      etiqueta=r"v_0", lado=LEFT, etiqueta_size=22)
+        self.f_vector(fig, "T", p(-1.1, 0.42), RIGHT, 0.8, color=self.CYAN,
+                      etiqueta=r"T", lado=UP, etiqueta_size=22)
+        self.f_vector(fig, "fk", p(-1.7, 0.42), LEFT, 0.9, color=self.YELLOW,
+                      etiqueta=r"f_k", lado=UP, etiqueta_size=22)
+        self.f_vector(fig, "w6", p(1.4, -1.1), DOWN, 0.8, color=self.ORANGE,
+                      etiqueta=r"6g", lado=LEFT, etiqueta_size=20)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Los bloques frenan hasta parar",
+            "revelar": ["mesa", "bloque8", "et8", "polea", "cuerdaH", "cuerdaV",
+                        "bloque6", "et6", "v8", "v6"],
+            "text": ["El de 6 kg baja y el de 8 kg avanza: ambos pierden rapidez."],
+        },
+        {
+            "titulo": "Trabajo y energía del sistema",
+            "revelar": ["T", "fk", "w6"],
+            "math": [
+                r"W_g + W_f = \Delta K = 0 - \tfrac12(14.0)(0.900)^2",
+                r"(6.00)(9.80)(2.00) - f_k(2.00) = -5.67",
+                r"f_k = 61.6\ \mathrm{N}",
+            ],
+            "resaltar": ["fk", "w6"],
+        },
+        {
+            "titulo": "Coeficiente de fricción cinética",
+            "math": [
+                r"\mu_k = \dfrac{f_k}{8.00\,g} = \dfrac{61.6}{78.4} = 0.786",
+            ],
+        },
+    ]
+    resultado_latex = r"\mu_k = 0.786"
+
+
+class P6_94(Cap6Scene):
+    numero = "6.94"
+    titulo = "Cuánta agua mueve la presa Grand Coulee"
+    lista_datos = [
+        ("Altura de la presa:", r"h = 170\ \mathrm{m}"),
+        ("Potencia eléctrica:", r"P = 2000\ \mathrm{MW}"),
+        ("Eficiencia:", r"92\%"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        muro = Polygon(p(-0.3, -1.8), p(0.9, -1.8), p(0.5, 1.2), p(-0.3, 1.2),
+                       color=self.MUTED, stroke_width=3, fill_color=self.PANEL,
+                       fill_opacity=0.9)
+        fig.registrar("presa", muro, lambda m: Create(m))
+        self.f_linea(fig, "nivel", p(-3.0, 1.2), p(-0.3, 1.2), color=self.CYAN, grosor=4)
+        self.f_vector(fig, "caida", p(1.1, 0.9), DOWN, 2.2, color=self.CYAN,
+                      etiqueta=r"Q", lado=RIGHT, etiqueta_size=26)
+        self.f_linea(fig, "h", p(-2.4, -1.8), p(-2.4, 1.2),
+                     color=self.GREEN, grosor=2, discontinuo=True,
+                     etiqueta=r"170", lado=LEFT, etiqueta_size=22)
+        self.f_texto(fig, "etP", r"2000\ \mathrm{MW}", (0.3, -2.25, 0), size=26,
+                     color=self.YELLOW, math=True)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El agua cae 170 m hasta los generadores",
+            "revelar": ["presa", "nivel", "caida", "h", "etP"],
+            "text": ["La gravedad trabaja sobre cada metro cúbico que baja."],
+        },
+        {
+            "titulo": "Caudal necesario",
+            "math": [
+                r"P = 0.92\,\rho Q g h",
+                r"Q = \dfrac{2.00\times10^9}{0.92(1000)(9.80)(170)}",
+                r"Q = 1.30\times10^3\ \mathrm{m^3/s}",
+            ],
+            "resaltar": ["caida", "h"],
+        },
+    ]
+    resultado_latex = r"Q = 1.30\times10^3\ \mathrm{m^3/s}"
+
+
+class P6_97(Cap6Scene):
+    numero = "6.97"
+    titulo = "Potencia para mover un tren"
+    lista_datos = [
+        ("Masa del tren:", r"m = 9.1\times10^5\ \mathrm{kg}"),
+        ("Rapidez:", r"v = 45\ \mathrm{m/s}"),
+        ("Fuerza de resistencia:", r"F = 53\ \mathrm{kN}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "via", p(-3.5, -0.9), p(3.5, -0.9), color=self.MUTED, grosor=4)
+        self.f_cuerpo(fig, "loco", p(-1.9, -0.35), ancho=1.2, alto=0.9,
+                      color=self.BLUE, etiqueta="loc")
+        self.f_cuerpo(fig, "vagon1", p(-0.5, -0.35), ancho=1.1, alto=0.9,
+                      color=self.GREEN, etiqueta="1")
+        self.f_cuerpo(fig, "vagon2", p(0.75, -0.35), ancho=1.1, alto=0.9,
+                      color=self.GREEN, etiqueta="2")
+        self.f_texto(fig, "etMas", "...", (1.9, -0.35, 0), size=30, color=self.MUTED)
+        self.f_vector(fig, "F", p(-1.9, 0.35), RIGHT, 1.4, color=self.RED,
+                      etiqueta=r"53\,\mathrm{kN}", lado=UP, etiqueta_size=22)
+        self.f_vector(fig, "v", p(0.75, 0.35), RIGHT, 1.2, color=self.CYAN,
+                      etiqueta=r"45", lado=UP, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El tren avanza a rapidez constante",
+            "revelar": ["via", "loco", "vagon1", "vagon2", "etMas", "F", "v"],
+            "text": ["La locomotora vence una resistencia constante de 53 kN."],
+        },
+        {
+            "titulo": "a) Potencia a rapidez constante",
+            "math": [
+                r"P = Fv = (53\times10^3)(45)",
+                r"P = 2.39\times10^6\ \mathrm{W} = 2.39\ \mathrm{MW}",
+            ],
+            "resaltar": ["F", "v"],
+        },
+        {
+            "titulo": "b) Extra para acelerar a 1.5 m/s²",
+            "math": [
+                r"P = mav = (9.1\times10^5)(1.5)(45)",
+                r"P = 61.4\times10^6\ \mathrm{W} = 61.4\ \mathrm{MW}",
+            ],
+        },
+        {
+            "titulo": "c) Extra subiendo cuesta de 1.5%",
+            "math": [
+                r"P = mgv\sin\alpha \approx mgv(0.015)",
+                r"P = (9.1\times10^5)(9.80)(45)(0.015) = 6.02\ \mathrm{MW}",
+            ],
+        },
+    ]
+    resultado_latex = r"2.39\ \mathrm{MW}; \quad +61.4\ \mathrm{MW}; \quad +6.02\ \mathrm{MW}"
