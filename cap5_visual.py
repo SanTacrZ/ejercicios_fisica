@@ -15,9 +15,9 @@ LOTE 2 (orden de la lista): 5.14, 5.15, 5.17, 5.19, 5.21
 LOTE 3 (orden de la lista): 5.27, 5.31, 5.33, 5.34, 5.42
 LOTE 4 (orden de la lista): 5.44, 5.45, 5.46, 5.47, 5.51
 LOTE 5 (orden de la lista): 5.56, 5.57, 5.58, 5.59, 5.60
+LOTE 6 (orden de la lista): 5.65, 5.66, 5.68, 5.72, 5.74
 PENDIENTES cap5:
-    65, 66, 68, 72, 74, 77, 80, 84, 85, 87,
-    92, 100, 101, 103, 110, 112, 119, 127
+    77, 80, 84, 85, 87, 92, 100, 101, 103, 110, 112, 119, 127
 """
 
 import numpy as np
@@ -1418,7 +1418,371 @@ class P5_56(ProblemaScene):
             "text": ["Cuanto más horizontal, mayor la tensión: la cuerda casi no puede quedar recta."],
         },
     ]
-    resultado_latex = r"T = 2.54\times10^3\ \mathrm{N}, \qquad \theta_{\min} = 1.01^\circ"
+    resultado_latex = r"N = 1.22\,mg, \qquad T = 0.700\,mg"
+
+
+class P5_65(ProblemaScene):
+    numero = "5.65"
+    titulo = "Dos cajas con fuerza inclinada y fricción"
+    subtitulo = "Segunda ley de Newton · fuerza con componente vertical"
+    lista_datos = [
+        ("Fuerza aplicada:", r"F = 40.0\ \mathrm{N}"),
+        ("Ángulo sobre la horizontal:", r"53.1^\circ"),
+        ("Masa de la caja B:", r"m_B = 5.00\ \mathrm{kg}"),
+        ("Coef. de fricción cinética:", r"\mu_k = 0.30"),
+        ("Aceleración:", r"a = 1.50\ \mathrm{m/s^2}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "suelo", p(-3.6, 0.0), p(3.4, 0.0), color=self.MUTED, grosor=4)
+        cA = p(-1.9, 0.42)
+        cB = p(0.6, 0.42)
+        self.f_cuerpo(fig, "cajaA", cA, ancho=1.1, alto=0.72,
+                      color=self.BLUE)
+        self.f_cuerpo(fig, "cajaB", cB, ancho=1.1, alto=0.72,
+                      color=self.GREEN)
+        self.f_texto(fig, "etA", "A", cA + UP * 0.62, size=24, color=self.WHITE)
+        self.f_texto(fig, "etB", "B", cB + UP * 0.62, size=24, color=self.WHITE)
+        self.f_linea(fig, "cuerda", p(-1.35, 0.42), p(0.05, 0.42), color=self.WHITE, grosor=5)
+        fdir = np.array([np.cos(np.deg2rad(53.1)), np.sin(np.deg2rad(53.1)), 0.0])
+        self.f_vector(fig, "F", cB, fdir, 1.35, color=self.RED,
+                      etiqueta=r"F", lado=UP, etiqueta_size=26)
+        self.f_angulo(fig, "angF", cB, cB + RIGHT, cB + fdir, radio=0.55,
+                      etiqueta=r"53.1^\circ", etiqueta_size=20)
+        self.f_vector(fig, "T_B", p(0.05, 0.42), LEFT, 0.7, color=self.CYAN,
+                      etiqueta=r"T", lado=UP, etiqueta_size=22)
+        self.f_vector(fig, "T_A", p(-1.35, 0.42), RIGHT, 0.7, color=self.CYAN,
+                      etiqueta=r"T", lado=UP, etiqueta_size=22)
+        self.f_vector(fig, "N_B", cB, UP, 0.8, color=self.CYAN,
+                      etiqueta=r"N_B", lado=RIGHT, etiqueta_size=20)
+        self.f_vector(fig, "w_B", cB, DOWN, 1.0, color=self.ORANGE,
+                      etiqueta=r"m_B g", lado=RIGHT, etiqueta_size=20)
+        self.f_vector(fig, "fk_B", cB + DOWN * 0.3, LEFT, 0.85, color=self.YELLOW,
+                      etiqueta=r"f_B", lado=DOWN, etiqueta_size=20)
+        self.f_vector(fig, "N_A", cA, UP, 0.85, color=self.CYAN,
+                      etiqueta=r"N_A", lado=LEFT, etiqueta_size=20)
+        self.f_vector(fig, "w_A", cA, DOWN, 0.85, color=self.ORANGE,
+                      etiqueta=r"m_A g", lado=LEFT, etiqueta_size=20)
+        self.f_vector(fig, "fk_A", cA + DOWN * 0.3, LEFT, 0.8, color=self.YELLOW,
+                      etiqueta=r"f_A", lado=DOWN, etiqueta_size=20)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "B tira de A con una cuerda",
+            "revelar": ["suelo", "cajaA", "cajaB", "etA", "etB", "cuerda", "F", "angF"],
+            "text": ["La fuerza F tiene componente hacia arriba: alivia la normal de B."],
+        },
+        {
+            "titulo": "Fuerza normal y fricción sobre B",
+            "revelar": ["N_B", "w_B", "fk_B"],
+            "math": [
+                r"N_B = m_B g - F\sin 53.1^\circ = 17.0\ \mathrm{N}",
+                r"f_B = \mu_k N_B = 5.10\ \mathrm{N}",
+            ],
+            "resaltar": ["N_B", "fk_B"],
+        },
+        {
+            "titulo": "Tensión en la cuerda (sobre B)",
+            "revelar": ["T_B", "T_A"],
+            "math": [
+                r"F\cos 53.1^\circ - T - f_B = m_B a",
+                r"T = 24.0 - 5.10 - 7.50 = 11.4\ \mathrm{N}",
+            ],
+            "resaltar": ["T_B"],
+        },
+        {
+            "titulo": "Masa de la caja A",
+            "revelar": ["N_A", "w_A", "fk_A"],
+            "math": [
+                r"T = m(a + \mu_k g) \;\Rightarrow\; m = \dfrac{T}{a+\mu_k g}",
+                r"m = \dfrac{11.4}{1.50 + 2.94} = 2.57\ \mathrm{kg}",
+            ],
+            "resaltar": ["T_A"],
+        },
+    ]
+    resultado_latex = r"T = 11.4\ \mathrm{N}, \qquad m = 2.57\ \mathrm{kg}"
+
+
+class P5_66(ProblemaScene):
+    numero = "5.66"
+    titulo = "Fuerza horizontal para subir una rampa"
+    subtitulo = "Segunda ley de Newton · empuje horizontal"
+    lista_datos = [
+        ("Masa de la caja:", r"m = 6.00\ \mathrm{kg}"),
+        ("Inclinación:", r"37.0^\circ"),
+        ("Coef. de fricción cinética:", r"\mu_k = 0.30"),
+        ("Aceleración deseada:", r"a = 4.20\ \mathrm{m/s^2}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        th = np.deg2rad(37.0)
+        u = np.array([np.cos(th), np.sin(th), 0.0])
+        n = np.array([-np.sin(th), np.cos(th), 0.0])
+        A = p(-3.1, -1.6)
+        geo = self.f_plano_inclinado(fig, "rampa", base=tuple(A),
+                                     angulo_grados=37.0, largo=4.4)
+        self.f_angulo(fig, "theta", A, A + u, A + RIGHT, radio=0.6,
+                      etiqueta=r"37^\circ", etiqueta_size=22)
+        centro = A + 2.2 * u + 0.42 * n
+        g = self.f_cuerpo(fig, "caja", centro, ancho=1.2, alto=0.72,
+                          color=self.BLUE)
+        g[0].rotate(th, about_point=centro)
+        self.f_vector(fig, "F", centro, RIGHT, 1.25, color=self.RED,
+                      etiqueta=r"F", lado=RIGHT, etiqueta_size=26)
+        self.f_vector(fig, "w", centro, DOWN, 1.25, color=self.ORANGE,
+                      etiqueta=r"mg", lado=DOWN, etiqueta_size=22)
+        self.f_vector(fig, "N", centro, n, 1.2, color=self.CYAN,
+                      etiqueta=r"N", lado=RIGHT, etiqueta_size=24)
+        self.f_descomponer(fig, "F", centro, RIGHT, 1.25, eje1=u, eje2=n,
+                           etiqueta_x=r"F\cos 37^\circ", etiqueta_y=r"F\sin 37^\circ",
+                           desplaz_x=(1.05, 0.12), desplaz_y=(-0.85, 0.3))
+        self.f_descomponer(fig, "w", centro, DOWN, 1.25, eje1=u, eje2=n,
+                           etiqueta_x=r"mg\sin 37^\circ", etiqueta_y=r"mg\cos 37^\circ",
+                           desplaz_x=(-0.9, -0.3), desplaz_y=(0.8, -0.25))
+        self.f_vector(fig, "fk", centro - 0.66 * u, -u, 0.7, color=self.YELLOW,
+                      etiqueta=r"f_k", lado=DOWN, etiqueta_size=20)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Empujamos la caja rampa arriba",
+            "revelar": ["rampa", "caja", "theta"],
+            "text": ["La fuerza F es horizontal: hay que descomponerla en ejes de la rampa."],
+        },
+        {
+            "titulo": "Diagrama de cuerpo libre",
+            "revelar": ["F", "w", "N"],
+            "math": [
+                r"F\cos 37^\circ - mg\sin 37^\circ - f_k = ma",
+                r"N = mg\cos 37^\circ + F\sin 37^\circ",
+            ],
+            "resaltar": ["F", "N"],
+        },
+        {
+            "titulo": "Descomposiciones en ejes de la rampa",
+            "revelar": ["F_guia", "F_x", "F_y", "w_guia", "w_x", "w_y", "fk"],
+            "text": ["F empuja contra la rampa: la normal (y la fricción) crecen con F."],
+            "resaltar": ["F_x", "w_x"],
+        },
+        {
+            "titulo": "Despejando la fuerza F",
+            "math": [
+                r"F(\cos 37^\circ - \mu_k\sin 37^\circ) = m(a + g\sin 37^\circ + \mu_k g\cos 37^\circ)",
+                r"F = \dfrac{74.7}{0.618} = 121\ \mathrm{N}",
+            ],
+        },
+    ]
+    resultado_latex = r"F = 121\ \mathrm{N}"
+
+
+class P5_68(ProblemaScene):
+    numero = "5.68"
+    titulo = "Bloque en rampa con masa colgante"
+    subtitulo = "Segunda ley de Newton · rampa con fricción"
+    lista_datos = [
+        ("Masa en la rampa:", r"m_1 = 20.0\ \mathrm{kg}"),
+        ("Ángulo:", r"\alpha = 53.1^\circ"),
+        ("Coef. de fricción:", r"\mu_k = 0.40"),
+        ("Descenso:", r"12.0\ \mathrm{m} \text{ en } 3.00\ \mathrm{s}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        th = np.deg2rad(53.1)
+        u = np.array([np.cos(th), np.sin(th), 0.0])
+        n = np.array([-np.sin(th), np.cos(th), 0.0])
+        A = p(-3.2, -1.4)
+        B = A + 3.6 * u
+        self.f_linea(fig, "rampa", A, B, color=self.BLUE, grosor=7)
+        self.f_linea(fig, "suelo", p(A[0], A[1]), p(B[0], A[1]), color=self.MUTED, grosor=3)
+        self.f_angulo(fig, "alpha", A, A + u, A + RIGHT, radio=0.55,
+                      etiqueta=r"\alpha", etiqueta_size=22)
+        P = B
+        self.f_polea(fig, "polea", P, radio=0.32, color=self.BLUE)
+        c1 = A + 1.7 * u + 0.40 * n
+        g = self.f_cuerpo(fig, "bloque1", c1, ancho=1.15, alto=0.7,
+                          color=self.BLUE, etiqueta=r"m_1")
+        g[0].rotate(th, about_point=c1)
+        self.f_linea(fig, "cuerdaR", c1 + 0.62 * u, P, color=self.WHITE, grosor=5)
+        mx = P[0] + 0.32
+        self.f_linea(fig, "cuerdaV", p(mx, P[1]), p(mx, 0.45), color=self.WHITE, grosor=5)
+        self.f_cuerpo(fig, "bloque2", p(mx, 0.1), ancho=0.9, alto=0.7,
+                      color=self.GREEN, etiqueta=r"m_2")
+        self.f_vector(fig, "T1", c1 + 0.62 * u, u, 0.8, color=self.CYAN,
+                      etiqueta=r"T", lado=UP, etiqueta_size=22)
+        self.f_vector(fig, "T2", p(mx, 0.45), UP, 0.65, color=self.CYAN,
+                      etiqueta=r"T", lado=LEFT, etiqueta_size=22)
+        self.f_vector(fig, "w1", c1, DOWN, 1.15, color=self.ORANGE,
+                      etiqueta=r"m_1g", lado=DOWN, etiqueta_size=20)
+        self.f_vector(fig, "fk1", c1 - 0.62 * u, -u, 0.7, color=self.YELLOW,
+                      etiqueta=r"f_k", lado=DOWN, etiqueta_size=20)
+        self.f_vector(fig, "N1", c1, n, 0.9, color=self.CYAN,
+                      etiqueta=r"N", lado=RIGHT, etiqueta_size=22)
+        self.f_vector(fig, "w2", p(mx, 0.1), DOWN, 0.9, color=self.ORANGE,
+                      etiqueta=r"m_2g", lado=LEFT, etiqueta_size=20)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "m₁ en la rampa unido a m₂ colgante",
+            "revelar": ["rampa", "suelo", "alpha", "polea", "bloque1", "bloque2",
+                        "cuerdaR", "cuerdaV"],
+            "text": ["La masa colgante desciende y arrastra al bloque rampa arriba."],
+        },
+        {
+            "titulo": "Aceleración del sistema",
+            "math": [r"a = \dfrac{2d}{t^2} = \dfrac{2(12.0)}{(3.00)^2} = 2.67\ \mathrm{m/s^2}"],
+        },
+        {
+            "titulo": "Ecuación de movimiento",
+            "revelar": ["T1", "T2", "w1", "fk1", "N1", "w2"],
+            "math": [r"m_2 g - m_1 g\sin\alpha - \mu_k m_1 g\cos\alpha = (m_1+m_2)a"],
+            "resaltar": ["T1", "T2"],
+        },
+        {
+            "titulo": "Despejar la masa colgante",
+            "math": [
+                r"m_2 = \dfrac{m_1(g\sin\alpha + \mu_k g\cos\alpha + a)}{g-a}",
+                r"m_2 = \dfrac{20.0(7.84+2.35+2.67)}{7.13} = 36.1\ \mathrm{kg}",
+            ],
+        },
+    ]
+    resultado_latex = r"m_2 = 36.1\ \mathrm{kg}"
+
+
+class P5_72(ProblemaScene):
+    numero = "5.72"
+    titulo = "Bloque A y peso colgante en equilibrio"
+    subtitulo = "Primera ley de Newton · fricción estática"
+    lista_datos = [
+        ("Peso del bloque A:", r"w_A = 60.0\ \mathrm{N}"),
+        ("Coef. de fricción estática:", r"\mu_s = 0.25"),
+        ("Peso colgante:", r"w = 12.0\ \mathrm{N}"),
+        ("Ángulo de la cuerda:", r"45.0^\circ"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "mesa", p(-3.2, 0.0), p(-0.3, 0.0), color=self.MUTED, grosor=4)
+        A = p(-1.5, 0.42)
+        self.f_cuerpo(fig, "bloqueA", A, ancho=1.2, alto=0.72,
+                      color=self.BLUE, etiqueta="A")
+        Q = A + 1.9 * np.array([np.cos(np.deg2rad(45.0)), np.sin(np.deg2rad(45.0)), 0.0])
+        self.f_polea(fig, "polea", Q, radio=0.3, color=self.BLUE)
+        self.f_linea(fig, "cuerda", A + p(0.2, 0.2), Q, color=self.WHITE, grosor=5)
+        self.f_linea(fig, "cuerdaV", p(Q[0] + 0.3, Q[1]), p(Q[0] + 0.3, 1.05),
+                     color=self.WHITE, grosor=5)
+        self.f_cuerpo(fig, "pesa", p(Q[0] + 0.3, 0.72), ancho=0.7, alto=0.55,
+                      color=self.ORANGE, etiqueta="w")
+        self.f_angulo(fig, "ang45", A + p(0.2, 0.2), A + p(1.2, 0.2), Q,
+                      radio=0.5, etiqueta=r"45^\circ", etiqueta_size=20)
+        self.f_vector(fig, "T", A + p(0.2, 0.2), Q - A, 0.95, color=self.CYAN,
+                      etiqueta=r"T", lado=UP, etiqueta_size=24)
+        self.f_vector(fig, "f", A, LEFT, 0.9, color=self.YELLOW,
+                      etiqueta=r"f", lado=UP, etiqueta_size=24)
+        self.f_vector(fig, "N_A", A, UP, 0.85, color=self.CYAN,
+                      etiqueta=r"N_A", lado=RIGHT, etiqueta_size=22)
+        self.f_vector(fig, "w_A", A, DOWN, 0.95, color=self.ORANGE,
+                      etiqueta=r"w_A", lado=RIGHT, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "A sobre la mesa, la pesa tira a 45°",
+            "revelar": ["mesa", "bloqueA", "polea", "cuerda", "cuerdaV", "pesa", "ang45"],
+            "text": ["La cuerda tira de A hacia arriba y hacia la derecha."],
+        },
+        {
+            "titulo": "Tensión de la cuerda",
+            "revelar": ["T"],
+            "math": [r"T = w = 12.0\ \mathrm{N}"],
+            "resaltar": ["T"],
+        },
+        {
+            "titulo": "Fuerza de fricción sobre A",
+            "revelar": ["f", "N_A", "w_A"],
+            "math": [r"f = T\cos 45^\circ = 12.0(0.707) = 8.49\ \mathrm{N}"],
+            "text": ["Dirigida hacia la izquierda, opuesta al tirón."],
+            "resaltar": ["f"],
+        },
+        {
+            "titulo": "Peso máximo para el equilibrio",
+            "math": [
+                r"w\cos 45^\circ = \mu_s(w_A - w\sin 45^\circ)",
+                r"w_{\max} = \dfrac{0.25(60.0)}{0.884} = 17.0\ \mathrm{N}",
+            ],
+            "text": ["Al crecer w, la fricción necesaria crece pero la normal disminuye."],
+        },
+    ]
+    resultado_latex = r"f = 8.49\ \mathrm{N}, \qquad w_{\max} = 17.0\ \mathrm{N}"
+
+
+class P5_74(ProblemaScene):
+    numero = "5.74"
+    titulo = "Lavador de ventanas empujando el cepillo"
+    subtitulo = "Primera ley de Newton · empuje contra la pared"
+    lista_datos = [
+        ("Peso del cepillo:", r"w = 15.0\ \mathrm{N}"),
+        ("Coef. de fricción cinética:", r"\mu_k = 0.150"),
+        ("Ángulo de la fuerza:", r"53.1^\circ"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        pared_x = -2.2
+        centro = p(-1.8, 0.0)
+        self.f_linea(fig, "pared", p(pared_x, -1.9), p(pared_x, 1.9),
+                     color=self.MUTED, grosor=4)
+        self.f_cuerpo(fig, "cepillo", centro, ancho=0.7, alto=1.15,
+                      color=self.BLUE)
+        self.f_texto(fig, "etCep", "cepillo", centro + DOWN * 0.82,
+                     size=20, color=self.MUTED)
+        fdir = np.array([-np.sin(np.deg2rad(53.1)), np.cos(np.deg2rad(53.1)), 0.0])
+        self.f_vector(fig, "F", centro, fdir, 1.5, color=self.RED,
+                      etiqueta=r"F", lado=UP, etiqueta_size=26)
+        self.f_angulo(fig, "angF", centro, centro + UP, centro + fdir, radio=0.55,
+                      etiqueta=r"53.1^\circ", etiqueta_size=20)
+        self.f_vector(fig, "N", centro, RIGHT, 1.05, color=self.CYAN,
+                      etiqueta=r"N", lado=UP, etiqueta_size=24)
+        self.f_vector(fig, "fk", centro + RIGHT * 0.2, DOWN, 0.65, color=self.YELLOW,
+                      etiqueta=r"f_k", lado=RIGHT, etiqueta_size=20)
+        self.f_vector(fig, "w", centro + LEFT * 0.2, DOWN, 1.05, color=self.ORANGE,
+                      etiqueta=r"w", lado=LEFT, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El cepillo sube a rapidez constante",
+            "revelar": ["pared", "cepillo", "etCep"],
+            "text": ["El lavador empuja hacia arriba y contra la ventana."],
+        },
+        {
+            "titulo": "La pared responde con la normal",
+            "revelar": ["F", "N", "angF"],
+            "math": [r"N = F\sin 53.1^\circ, \qquad f_k = \mu_k F\sin 53.1^\circ"],
+            "resaltar": ["N"],
+        },
+        {
+            "titulo": "Equilibrio vertical (rapidez constante)",
+            "revelar": ["fk", "w"],
+            "math": [
+                r"F\cos 53.1^\circ = w + f_k",
+                r"F(\cos 53.1^\circ - \mu_k\sin 53.1^\circ) = w",
+            ],
+            "resaltar": ["F"],
+        },
+        {
+            "titulo": "Resolver la fuerza y la normal",
+            "math": [
+                r"F = \dfrac{15.0}{0.6004-0.1200} = 31.2\ \mathrm{N}",
+                r"N = F\sin 53.1^\circ = 25.0\ \mathrm{N}",
+            ],
+        },
+    ]
+    resultado_latex = r"F = 31.2\ \mathrm{N}, \qquad N = 25.0\ \mathrm{N}"
 
 
 class P5_57(ProblemaScene):
