@@ -13,8 +13,9 @@ LOTE 2 (orden de la lista): 6.12, 6.14, 6.19, 6.20, 6.21
 LOTE 3 (orden de la lista): 6.33, 6.34, 6.35, 6.37, 6.43
 LOTE 4 (orden de la lista): 6.45, 6.46, 6.52, 6.56, 6.60
 LOTE 5 (orden de la lista): 6.61, 6.65, 6.66, 6.69, 6.71
+LOTE 6 (orden de la lista): 6.72, 6.75, 6.76, 6.80, 6.81
 PENDIENTES cap6:
-    72, 75, 76, 80, 81, 84, 85, 87, 94, 97
+    84, 85, 87, 94, 97
 """
 
 import numpy as np
@@ -1466,3 +1467,306 @@ class P6_71(Cap6Scene):
         },
     ]
     resultado_latex = r"W = k\left(\dfrac{1}{x_2}-\dfrac{1}{x_1}\right)\ (< 0\ \text{si }x_2 > x_1)"
+
+
+class P6_72(Cap6Scene):
+    numero = "6.72"
+    titulo = "Asteroide que cae a la Tierra"
+    lista_datos = [
+        ("Masa del asteroide:", r"m = 20000\ \mathrm{kg}"),
+        ("Radio terrestre:", r"R = 6.37\times10^6\ \mathrm{m}"),
+        ("Parte del reposo en:", r"x \to \infty"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        Ct = p(-1.5, 0.9)
+        tierra = Circle(radius=1.0, color=self.BLUE, stroke_width=7).move_to(Ct)
+        fig.registrar("tierra", tierra, lambda m: Create(m))
+        self.f_linea(fig, "radioT", Ct, Ct + p(0.7, -0.7), color=self.GREEN,
+                     grosor=2, discontinuo=True, etiqueta=r"R", lado=DOWN,
+                     etiqueta_size=22)
+        A = p(1.7, 1.5)
+        self.f_cuerpo(fig, "asteroide", A, forma="punto", color=self.ORANGE)
+        self.f_vector(fig, "v", A, Ct - A, 1.1, color=self.CYAN,
+                      etiqueta=r"v", lado=UP, etiqueta_size=24)
+        self.f_vector(fig, "Fg", A + DOWN * 0.3, Ct - A, 0.9, color=self.RED,
+                      etiqueta=r"F_g", lado=RIGHT, etiqueta_size=22)
+        axes = self.f_grafica(
+            fig, "grafica", [lambda x: 1.0 / (x ** 2)],
+            x_range=[1, 6, 1], y_range=[0, 1.2, 0.3],
+            x_label="x\\,(R)", y_label="F\\,(mg)",
+            ancho=3.4, alto=1.8, centro=(0.4, -2.0),
+        )
+        plot = fig.mob("grafica_c0")
+        area = axes.get_area(plot, x_range=[1, 6], color=self.RED, opacity=0.3)
+        fig.registrar("area", area, lambda m: FadeIn(m))
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Caída desde muy lejos",
+            "revelar": ["tierra", "radioT", "asteroide", "v"],
+            "text": ["La gravedad crece como 1/x² al acercarse."],
+        },
+        {
+            "titulo": "La fuerza en unidades de mg",
+            "revelar": ["Fg", "grafica_ejes", "grafica_c0"],
+            "math": [r"F = \dfrac{GMm}{x^2} = mg\left(\dfrac{R}{x}\right)^2"],
+            "resaltar": ["Fg"],
+        },
+        {
+            "titulo": "Trabajo: el área hasta la superficie",
+            "revelar": ["area"],
+            "math": [r"W = \int_{\infty}^{R}\!F\,dx = mgR"],
+            "resaltar": ["area"],
+        },
+        {
+            "titulo": "Rapidez mínima de impacto",
+            "math": [
+                r"\tfrac12 mv^2 = mgR \;\Rightarrow\; v = \sqrt{2gR}",
+                r"v = \sqrt{2(9.80)(6.37\times10^6)} = 1.12\times10^4\ \mathrm{m/s}",
+            ],
+        },
+    ]
+    resultado_latex = r"v = 11.2\ \mathrm{km/s}"
+
+
+class P6_75(Cap6Scene):
+    numero = "6.75"
+    titulo = "Bloque girando atado por un agujero"
+    lista_datos = [
+        ("Masa del bloque:", r"m = 0.0900\ \mathrm{kg}"),
+        ("Radio inicial:", r"r = 0.40\ \mathrm{m},\ v = 0.70\ \mathrm{m/s}"),
+        ("Radio final:", r"r = 0.10\ \mathrm{m},\ v = 2.80\ \mathrm{m/s}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        O = p(-0.6, 0.2)
+        self.f_texto(fig, "mesa", "vista superior", (-0.6, 2.3, 0), size=20,
+                     color=self.MUTED)
+        self.f_cuerpo(fig, "agujero", O, forma="punto", color=self.WHITE)
+        orb1 = Circle(radius=1.35, color=self.MUTED, stroke_width=2).move_to(O)
+        fig.registrar("orbita1", orb1, lambda m: Create(m))
+        orb2 = Circle(radius=0.38, color=self.GREEN, stroke_width=2).move_to(O)
+        fig.registrar("orbita2", orb2, lambda m: Create(m))
+        B1 = O + p(1.35, 0.0)
+        B2 = O + p(0.0, 0.38)
+        self.f_linea(fig, "cuerda1", O, B1, color=self.WHITE, grosor=4)
+        self.f_linea(fig, "cuerda2", O, B2, color=self.WHITE, grosor=4)
+        self.f_cuerpo(fig, "bloque1", B1, forma="punto", color=self.CYAN)
+        self.f_cuerpo(fig, "bloque2", B2, forma="punto", color=self.GREEN)
+        self.f_linea(fig, "r1", O + DOWN * 0.5, B1 + DOWN * 0.5,
+                     color=self.CYAN, grosor=2, discontinuo=True,
+                     etiqueta=r"0.40", lado=DOWN, etiqueta_size=20)
+        self.f_linea(fig, "r2", O + UP * 0.75, B2 + UP * 0.37,
+                     color=self.GREEN, grosor=2, discontinuo=True,
+                     etiqueta=r"0.10", lado=UP, etiqueta_size=20)
+        self.f_vector(fig, "T1", B1, O - B1, 0.85, color=self.CYAN,
+                      etiqueta=r"T", lado=UP, etiqueta_size=22)
+        self.f_vector(fig, "v1", B1, UP, 0.8, color=self.CYAN,
+                      etiqueta=r"v", lado=RIGHT, etiqueta_size=22)
+        self.f_vector(fig, "T2", B2, O - B2, 0.7, color=self.GREEN,
+                      etiqueta=r"T", lado=RIGHT, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El bloque gira atado al centro",
+            "revelar": ["mesa", "agujero", "orbita1", "cuerda1", "bloque1", "r1"],
+            "text": ["La tensión apunta al centro: es la fuerza centrípeta."],
+        },
+        {
+            "titulo": "a) Tensión con r = 0.40 m",
+            "revelar": ["T1", "v1"],
+            "math": [r"T = \dfrac{mv^2}{r} = \dfrac{(0.0900)(0.70)^2}{0.40} = 0.110\ \mathrm{N}"],
+            "resaltar": ["T1"],
+        },
+        {
+            "titulo": "Se tira de la cuerda hasta r = 0.10 m",
+            "revelar": ["orbita2", "cuerda2", "bloque2", "r2", "T2"],
+            "math": [r"T = \dfrac{(0.0900)(2.80)^2}{0.10} = 7.06\ \mathrm{N}"],
+            "resaltar": ["T2"],
+        },
+        {
+            "titulo": "c) Trabajo de quien tira",
+            "math": [
+                r"W = \Delta K = \tfrac12(0.0900)(2.80^2 - 0.70^2)",
+                r"W = 0.331\ \mathrm{J}",
+            ],
+            "text": ["Acercar el bloque exige trabajo: gira más rápido."],
+        },
+    ]
+    resultado_latex = r"T = 0.110\ \mathrm{N} \to 7.06\ \mathrm{N}, \quad W = 0.331\ \mathrm{J}"
+
+
+class P6_76(Cap6Scene):
+    numero = "6.76"
+    titulo = "Protón contra un núcleo de uranio"
+    lista_datos = [
+        ("Masa del protón:", r"m = 1.67\times10^{-27}\ \mathrm{kg}"),
+        ("Rapidez inicial:", r"v_0 = 3.00\times10^5\ \mathrm{m/s}"),
+        ("Repulsión:", r"F = \alpha/x^2,\ \alpha = 2.12\times10^{-26}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        N = p(-2.4, 0.2)
+        self.f_cuerpo(fig, "nucleo", N, ancho=0.7, alto=0.7,
+                      color=self.RED, etiqueta="U")
+        self.f_linea(fig, "eje", p(-2.4, 0.2), p(2.6, 0.2), color=self.MUTED, grosor=2)
+        P = p(1.6, 0.2)
+        self.f_cuerpo(fig, "proton", P, forma="punto", color=self.CYAN)
+        self.f_vector(fig, "v0", P, LEFT, 1.2, color=self.CYAN,
+                      etiqueta=r"v_0", lado=UP, etiqueta_size=24)
+        self.f_vector(fig, "F", P + UP * 0.25, RIGHT, 1.1, color=self.RED,
+                      etiqueta=r"F", lado=UP, etiqueta_size=24)
+        self.f_linea(fig, "d1", p(1.6, -0.6), p(1.6, -1.1),
+                     color=self.CYAN, grosor=2, discontinuo=True,
+                     etiqueta=r"5.00", lado=DOWN, etiqueta_size=20)
+        self.f_linea(fig, "d2", p(-0.6, -0.6), p(-0.6, -1.1),
+                     color=self.YELLOW, grosor=2, discontinuo=True,
+                     etiqueta=r"8{\times}10^{-10}", lado=DOWN, etiqueta_size=18)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Repulsión eléctrica frena al protón",
+            "revelar": ["nucleo", "eje", "proton", "v0", "F", "d1"],
+            "text": ["La fuerza crece como 1/x² al acercarse al núcleo."],
+        },
+        {
+            "titulo": "a) Rapidez a 8.00×10⁻¹⁰ m",
+            "revelar": ["d2"],
+            "math": [
+                r"W = -\alpha\left(\dfrac{1}{x_2}-\dfrac{1}{x_1}\right) = -2.65\times10^{-17}\ \mathrm{J}",
+                r"v = 2.41\times10^5\ \mathrm{m/s}",
+            ],
+            "resaltar": ["F"],
+        },
+        {
+            "titulo": "b) Máximo acercamiento",
+            "math": [
+                r"\tfrac12 mv_0^2 = \alpha\left(\dfrac{1}{x_{\min}}-\dfrac{1}{5.00}\right)",
+                r"x_{\min} = 2.82\times10^{-10}\ \mathrm{m}",
+            ],
+        },
+        {
+            "titulo": "c) De regreso a 5.00 m",
+            "math": [r"v = 3.00\times10^5\ \mathrm{m/s}"],
+            "text": ["La fuerza es conservativa: recupera su rapidez inicial."],
+        },
+    ]
+    resultado_latex = r"v = 2.41\times10^5\ \mathrm{m/s}, \quad x_{\min} = 2.82\times10^{-10}\ \mathrm{m}"
+
+
+class P6_80(Cap6Scene):
+    numero = "6.80"
+    titulo = "Esfera disparada por un rifle de resorte"
+    lista_datos = [
+        ("Constante:", r"k = 400\ \mathrm{N/m}"),
+        ("Compresión:", r"6.00\ \mathrm{cm}"),
+        ("Masa de la esfera:", r"m = 0.0300\ \mathrm{kg}"),
+        ("Resistencia en el cañón:", r"6.00\ \mathrm{N}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "tuboS", p(-2.8, 0.35), p(-0.2, 0.35), color=self.MUTED, grosor=3)
+        self.f_linea(fig, "tuboI", p(-2.8, -0.35), p(-0.2, -0.35), color=self.MUTED, grosor=3)
+        fig.registrar("resorte", resorte(p(-2.8, 0.0), p(-1.6, 0.0), vueltas=8),
+                       lambda m: Create(m))
+        self.f_cuerpo(fig, "esfera", p(-1.35, 0.0), ancho=0.5, alto=0.5,
+                      color=self.ORANGE, etiqueta="m")
+        self.f_vector(fig, "v", p(-1.35, 0.0), RIGHT, 1.1, color=self.CYAN,
+                      etiqueta=r"v", lado=UP, etiqueta_size=24)
+        self.f_linea(fig, "mMax", p(-0.7, -0.35), p(-0.7, -0.9),
+                     color=self.YELLOW, grosor=2, discontinuo=True,
+                     etiqueta=r"v_{\max}", lado=DOWN, etiqueta_size=20)
+        self.f_linea(fig, "boca", p(-0.2, -0.35), p(-0.2, -0.9),
+                     color=self.GREEN, grosor=2, discontinuo=True,
+                     etiqueta=r"salida", lado=DOWN, etiqueta_size=20)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El resorte empuja a la esfera por el cañón",
+            "revelar": ["tuboS", "tuboI", "resorte", "esfera", "v", "boca"],
+            "text": ["La esfera sale justo al agotarse el resorte."],
+        },
+        {
+            "titulo": "a) Sin fricción: rapidez de salida",
+            "math": [
+                r"\tfrac12 kx^2 = \tfrac12 mv^2",
+                r"v = 0.0600\sqrt{\dfrac{400}{0.0300}} = 6.93\ \mathrm{m/s}",
+            ],
+            "resaltar": ["boca"],
+        },
+        {
+            "titulo": "b) Con resistencia de 6.00 N",
+            "math": [
+                r"\tfrac12 kx^2 - Fd = \tfrac12 mv^2",
+                r"0.720 - 0.360 = \tfrac12(0.0300)v^2",
+                r"v = 4.90\ \mathrm{m/s}",
+            ],
+        },
+        {
+            "titulo": "c) Dónde va más rápido",
+            "revelar": ["mMax"],
+            "math": [
+                r"kx = 6.00 \;\Rightarrow\; x = 0.0150\ \mathrm{m}",
+                r"d = 0.0600 - 0.0150 = 0.0450\ \mathrm{m},\quad v = 5.48\ \mathrm{m/s}",
+            ],
+            "text": ["El máximo es donde el resorte iguala a la resistencia."],
+            "resaltar": ["mMax"],
+        },
+    ]
+    resultado_latex = r"v_a = 6.93\ \mathrm{m/s}, \quad v_b = 4.90\ \mathrm{m/s}, \quad v_{\max} = 5.48\ \mathrm{m/s}"
+
+
+class P6_81(Cap6Scene):
+    numero = "6.81"
+    titulo = "Libro lanzado por un resorte sobre mesa áspera"
+    lista_datos = [
+        ("Masa del libro:", r"m = 2.50\ \mathrm{kg}"),
+        ("Constante:", r"k = 250\ \mathrm{N/m}"),
+        ("Compresión:", r"x = 0.250\ \mathrm{m}"),
+        ("Fricción:", r"\mu_k = 0.30"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "mesa", p(-3.4, -0.5), p(3.2, -0.5), color=self.MUTED, grosor=4)
+        self.f_linea(fig, "pared", p(-3.1, -0.5), p(-3.1, 1.5), color=self.MUTED, grosor=4)
+        fig.registrar("resorte", resorte(p(-3.1, 0.25), p(-2.1, 0.25), vueltas=8),
+                       lambda m: Create(m))
+        self.f_cuerpo(fig, "libro", p(-1.55, -0.05), ancho=1.0, alto=0.7,
+                      color=self.BLUE, etiqueta="libro")
+        self.f_vector(fig, "v", p(-1.05, -0.05), RIGHT, 1.1, color=self.CYAN,
+                      etiqueta=r"v", lado=UP, etiqueta_size=24)
+        self.f_vector(fig, "fk", p(-2.05, -0.05), LEFT, 1.0, color=self.YELLOW,
+                      etiqueta=r"f_k", lado=UP, etiqueta_size=24)
+        self.f_linea(fig, "d", p(-2.1, -1.0), p(0.9, -1.0),
+                     color=self.GREEN, grosor=2, discontinuo=True,
+                     etiqueta=r"d", lado=DOWN, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El resorte lanza al libro sobre lo áspero",
+            "revelar": ["mesa", "pared", "resorte", "libro", "v", "fk"],
+            "text": ["La fricción actúa en todo el recorrido, incluso mientras empuja el resorte."],
+        },
+        {
+            "titulo": "Toda la energía la gasta la fricción",
+            "revelar": ["d"],
+            "math": [
+                r"\tfrac12 kx^2 = f_k d = \mu_k mg\,d",
+                r"d = \dfrac{0.5(250)(0.250)^2}{0.30(2.50)(9.80)}",
+                r"d = \dfrac{7.81}{7.35} = 1.06\ \mathrm{m}",
+            ],
+            "resaltar": ["d", "fk"],
+        },
+    ]
+    resultado_latex = r"d = 1.06\ \mathrm{m}\ \text{desde que se suelta}"
