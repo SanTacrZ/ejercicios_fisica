@@ -12,8 +12,9 @@ LOTE 1 (orden de la lista): 6.1, 6.4, 6.5, 6.6, 6.8
 LOTE 2 (orden de la lista): 6.12, 6.14, 6.19, 6.20, 6.21
 LOTE 3 (orden de la lista): 6.33, 6.34, 6.35, 6.37, 6.43
 LOTE 4 (orden de la lista): 6.45, 6.46, 6.52, 6.56, 6.60
+LOTE 5 (orden de la lista): 6.61, 6.65, 6.66, 6.69, 6.71
 PENDIENTES cap6:
-    61, 65, 66, 69, 71, 72, 75, 76, 80, 81, 84, 85, 87, 94, 97
+    72, 75, 76, 80, 81, 84, 85, 87, 94, 97
 """
 
 import numpy as np
@@ -1178,3 +1179,290 @@ class P6_60(Cap6Scene):
         },
     ]
     resultado_latex = r"W = -209\ \mathrm{J}"
+
+
+class P6_61(Cap6Scene):
+    numero = "6.61"
+    titulo = "Energía cinética de una barra giratoria"
+    lista_datos = [
+        ("Masa de la barra:", r"M = 12.0\ \mathrm{kg}"),
+        ("Longitud:", r"L = 2.00\ \mathrm{m}"),
+        ("Giro:", r"5.00\ \mathrm{rev\ cada}\ 3.00\ \mathrm{s}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        O = p(-1.5, 0.0)
+        ang = np.deg2rad(35.0)
+        udir = np.array([np.cos(ang), np.sin(ang), 0.0])
+        pdir = np.array([-np.sin(ang), np.cos(ang), 0.0])
+        E = O + 2.0 * udir
+        self.f_linea(fig, "barra", O, E, color=self.WHITE, grosor=7)
+        self.f_cuerpo(fig, "pivote", O, forma="punto", color=self.YELLOW)
+        giro = CurvedArrow(O + LEFT * 0.7 + DOWN * 0.5, O + LEFT * 0.7 + UP * 0.6,
+                           angle=PI / 2, color=self.YELLOW, tip_length=0.16)
+        fig.registrar("giro", giro, lambda m: Create(m))
+        self.f_texto(fig, "omega", r"\omega", (-2.5, 1.1, 0), size=30,
+                     color=self.YELLOW, math=True)
+        for i, r in enumerate([0.5, 1.0, 1.5, 2.0]):
+            self.f_vector(fig, f"v{i}", O + r * udir, pdir, 0.28 * r + 0.12,
+                          color=self.CYAN, etiqueta=None, grosor=6)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "La barra gira alrededor de un extremo",
+            "revelar": ["barra", "pivote", "giro", "omega"],
+            "math": [r"\omega = \dfrac{5.00(2\pi)}{3.00} = 10.5\ \mathrm{rad/s}"],
+        },
+        {
+            "titulo": "Cada punto va a distinta rapidez",
+            "revelar": ["v0", "v1", "v2", "v3"],
+            "math": [r"v = \omega r, \qquad I = \tfrac13 ML^2 = \tfrac13(12.0)(2.00)^2 = 16.0\ \mathrm{kg\,m^2}"],
+            "text": ["El momento de inercia ya promedia todos esos puntos."],
+        },
+        {
+            "titulo": "Energía cinética rotacional",
+            "math": [
+                r"K = \tfrac12 I\omega^2 = \tfrac12(16.0)(10.5)^2",
+                r"K = 877\ \mathrm{J}",
+            ],
+        },
+    ]
+    resultado_latex = r"K = 877\ \mathrm{J}"
+
+
+class P6_65(Cap6Scene):
+    numero = "6.65"
+    titulo = "Caja empujada rampa arriba"
+    lista_datos = [
+        ("Masa de la caja:", r"m = 20.0\ \mathrm{kg}"),
+        ("Rampa:", r"15.0\ \mathrm{m},\ 34.0^\circ"),
+        ("Empuje horizontal:", r"F = 290\ \mathrm{N}"),
+        ("Fricción constante:", r"f_k = 65.0\ \mathrm{N}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        th = np.deg2rad(34.0)
+        u = np.array([np.cos(th), np.sin(th), 0.0])
+        n = np.array([-np.sin(th), np.cos(th), 0.0])
+        A = p(-3.0, -1.4)
+        B = A + 4.5 * u
+        self.f_linea(fig, "rampa", A, B, color=self.BLUE, grosor=6)
+        self.f_linea(fig, "base", p(A[0], A[1]), p(B[0], A[1]), color=self.MUTED, grosor=3)
+        self.f_angulo(fig, "theta", A, A + u, A + RIGHT, radio=0.6,
+                      etiqueta=r"34^\circ", etiqueta_size=20)
+        C = A + 2.0 * u + 0.42 * n
+        g = self.f_cuerpo(fig, "caja", C, ancho=1.2, alto=0.72,
+                          color=self.BLUE)
+        g[0].rotate(th, about_point=C)
+        self.f_texto(fig, "etCaja", "caja", C + UP * 0.62 + LEFT * 0.85,
+                     size=22, color=self.WHITE)
+        self.f_vector(fig, "F", C + LEFT * 0.6, RIGHT, 1.3, color=self.RED,
+                      etiqueta=r"290", lado=RIGHT, etiqueta_size=22)
+        self.f_vector(fig, "fk", C - 0.66 * u, -u, 0.8, color=self.YELLOW,
+                      etiqueta=r"65", lado=DOWN, etiqueta_size=20)
+        self.f_vector(fig, "w", C, DOWN, 1.05, color=self.ORANGE,
+                      etiqueta=r"mg", lado=RIGHT, etiqueta_size=22)
+        self.f_vector(fig, "N", C, n, 1.0, color=self.CYAN,
+                      etiqueta=r"N", lado=RIGHT, etiqueta_size=22)
+        self.f_linea(fig, "d15", A + 0.3 * u - 0.3 * n, A + 4.2 * u - 0.3 * n,
+                     color=self.GREEN, grosor=2, discontinuo=True,
+                     etiqueta=r"15", lado=DOWN, etiqueta_size=20)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Empuje horizontal rampa arriba",
+            "revelar": ["rampa", "base", "theta", "caja", "etCaja", "d15"],
+            "text": ["Parte del reposo al pie de la rampa."],
+        },
+        {
+            "titulo": "a) Trabajo total sobre la caja",
+            "revelar": ["F", "fk", "w", "N"],
+            "math": [
+                r"F_{\parallel} = 290\cos 34^\circ = 240\ \mathrm{N}",
+                r"W = (240 - 65.0 - 196\sin 34^\circ)(15.0)",
+                r"W = (65.8)(15.0) = 987\ \mathrm{J}",
+            ],
+            "resaltar": ["F", "fk"],
+        },
+        {
+            "titulo": "b) Tiempo de subida",
+            "math": [
+                r"a = \dfrac{65.8}{20.0} = 3.29\ \mathrm{m/s^2}",
+                r"t = \sqrt{\dfrac{2(15.0)}{3.29}} = 3.02\ \mathrm{s}",
+            ],
+        },
+    ]
+    resultado_latex = r"W = 987\ \mathrm{J}, \qquad t = 3.02\ \mathrm{s}"
+
+
+class P6_66(Cap6Scene):
+    numero = "6.66"
+    titulo = "Trabajo sobre cada bloque del sistema"
+    lista_datos = [
+        ("Bloque en la mesa:", r"20.0\ \mathrm{N}"),
+        ("Bloque colgante:", r"12.0\ \mathrm{N}"),
+        ("Desplazamiento:", r"0.75\ \mathrm{m}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "mesa", p(-3.2, 0.0), p(1.4, 0.0), color=self.MUTED, grosor=4)
+        self.f_cuerpo(fig, "bloque20", p(-1.7, 0.42), ancho=1.15, alto=0.72,
+                      color=self.BLUE, etiqueta="20 N")
+        self.f_polea(fig, "polea", p(1.4, 0.42), radio=0.32, color=self.BLUE)
+        self.f_linea(fig, "cuerdaH", p(-1.1, 0.42), p(1.08, 0.42), color=self.WHITE, grosor=5)
+        self.f_linea(fig, "cuerdaV", p(1.4, 0.1), p(1.4, -0.45), color=self.WHITE, grosor=5)
+        self.f_cuerpo(fig, "bloque12", p(1.4, -0.8), ancho=0.85, alto=0.6,
+                      color=self.GREEN, etiqueta="12 N")
+        self.f_linea(fig, "d75", p(-1.7, -0.75), p(-0.95, -0.75),
+                     color=self.GREEN, grosor=2, discontinuo=True,
+                     etiqueta=r"0.75", lado=DOWN, etiqueta_size=20)
+        self.f_vector(fig, "T20", p(-1.1, 0.42), RIGHT, 0.85, color=self.CYAN,
+                      etiqueta=r"T", lado=UP, etiqueta_size=22)
+        self.f_vector(fig, "T12", p(1.4, -0.5), UP, 0.7, color=self.CYAN,
+                      etiqueta=r"T", lado=LEFT, etiqueta_size=22)
+        self.f_vector(fig, "w12", p(1.4, -1.1), DOWN, 0.8, color=self.ORANGE,
+                      etiqueta=r"12", lado=LEFT, etiqueta_size=20)
+        self.f_vector(fig, "fk", p(-1.7, 0.42), LEFT, 0.85, color=self.YELLOW,
+                      etiqueta=r"f_k", lado=UP, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El sistema de dos bloques se mueve",
+            "revelar": ["mesa", "bloque20", "polea", "cuerdaH", "cuerdaV",
+                        "bloque12", "d75"],
+            "text": ["El de 12 N baja 0.75 m y el de 20 N avanza 0.75 m."],
+        },
+        {
+            "titulo": "a) Sin fricción: la tensión acelera",
+            "revelar": ["T20", "T12", "w12"],
+            "math": [
+                r"T = \dfrac{(20/9.8)(12)}{(32/9.8)} = 7.50\ \mathrm{N}",
+                r"12\,\mathrm{N}: W_g = +9.00\ \mathrm{J},\ W_T = -5.62\ \mathrm{J}",
+                r"20\,\mathrm{N}: W_T = +5.62\ \mathrm{J}",
+            ],
+            "resaltar": ["T20", "T12"],
+        },
+        {
+            "titulo": "b) Con fricción: primero ver si se mueve",
+            "revelar": ["fk"],
+            "math": [
+                r"f_{s,\max} = 0.500(20.0) = 10.0\ \mathrm{N} < 12.0\ \mathrm{N}",
+                r"T = 9.94\ \mathrm{N}, \quad f_k = 0.325(20.0) = 6.50\ \mathrm{N}",
+            ],
+            "text": ["Sí se mueve: la estática no alcanza a sostenerlo."],
+            "resaltar": ["fk"],
+        },
+        {
+            "titulo": "Trabajos con fricción",
+            "math": [
+                r"12\,\mathrm{N}: W_g = +9.00\ \mathrm{J},\ W_T = -7.45\ \mathrm{J}",
+                r"20\,\mathrm{N}: W_T = +7.45\ \mathrm{J},\ W_f = -4.88\ \mathrm{J}",
+            ],
+        },
+    ]
+    resultado_latex = r"a)\ T = 7.50\ \mathrm{N}; \qquad b)\ T = 9.94\ \mathrm{N}"
+
+
+class P6_69(Cap6Scene):
+    numero = "6.69"
+    titulo = "Latigazo cervical: rapidez máxima segura"
+    lista_datos = [
+        ("Masa de la cabeza:", r"m = 5.0\ \mathrm{kg}"),
+        ("Energía de fractura:", r"8.0\ \mathrm{J}"),
+        ("Duración del choque:", r"10.0\ \mathrm{ms}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "piso", p(-3.4, -1.2), p(3.4, -1.2), color=self.MUTED, grosor=4)
+        self.f_cuerpo(fig, "auto", p(0.0, -0.6), ancho=2.2, alto=0.9,
+                      color=self.BLUE, etiqueta="auto")
+        self.f_cuerpo(fig, "cabeza", p(0.4, 0.35), ancho=0.6, alto=0.55,
+                      color=self.ORANGE, etiqueta="5 kg")
+        self.f_vector(fig, "choque", p(-2.9, -0.6), RIGHT, 1.2, color=self.RED,
+                      etiqueta=r"choque", lado=UP, etiqueta_size=22)
+        self.f_vector(fig, "a", p(0.0, -1.55), RIGHT, 1.2, color=self.RED,
+                      etiqueta=r"a", lado=DOWN, etiqueta_size=24)
+        self.f_texto(fig, "etT", r"10.0\ \mathrm{ms}", (0.0, -2.0, 0), size=24,
+                     color=self.MUTED, math=True)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Colisión por detrás de 10.0 ms",
+            "revelar": ["piso", "auto", "cabeza", "choque", "etT"],
+            "text": ["Los huesos del cuello absorben la energía de la cabeza."],
+        },
+        {
+            "titulo": "a) Rapidez máxima sin fractura",
+            "revelar": ["a"],
+            "math": [
+                r"\tfrac12 mv^2 = 8.0\ \mathrm{J}",
+                r"v = \sqrt{\dfrac{2(8.0)}{5.0}} = 1.79\ \mathrm{m/s} = 4.0\ \mathrm{mph}",
+            ],
+            "resaltar": ["cabeza"],
+        },
+        {
+            "titulo": "b) Aceleración de los pasajeros",
+            "math": [
+                r"a = \dfrac{\Delta v}{\Delta t} = \dfrac{1.79}{0.0100}",
+                r"a = 179\ \mathrm{m/s^2} \approx 18g",
+            ],
+            "resaltar": ["a"],
+        },
+    ]
+    resultado_latex = r"v_{\max} = 1.79\ \mathrm{m/s}\ (4.0\ \mathrm{mph}), \quad a = 179\ \mathrm{m/s^2}"
+
+
+class P6_71(Cap6Scene):
+    numero = "6.71"
+    titulo = "Trabajo de una fuerza tipo gravitacional"
+    lista_datos = [
+        ("Fuerza atractiva:", r"F_x = -k/x^2"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        axes = self.f_grafica(
+            fig, "grafica", [lambda x: -1.0 / (x ** 2)],
+            x_range=[0.5, 3.5, 0.5], y_range=[-2.0, 0.2, 0.5],
+            x_label="x", y_label="F_x",
+            ancho=4.4, alto=3.0, centro=(0.0, -0.2),
+        )
+        plot = fig.mob("grafica_c0")
+        area = axes.get_area(plot, x_range=[1.0, 3.0], color=self.RED, opacity=0.3)
+        fig.registrar("area", area, lambda m: FadeIn(m))
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Fuerza atractiva hacia el origen",
+            "revelar": ["grafica_ejes", "grafica_c0"],
+            "text": ["Como la gravedad: tira hacia el origen en todo x."],
+        },
+        {
+            "titulo": "a) Trabajo de x₁ a x₂",
+            "revelar": ["area"],
+            "math": [
+                r"W = \int_{x_1}^{x_2}\!-\dfrac{k}{x^2}\,dx = \left[\dfrac{k}{x}\right]_{x_1}^{x_2}",
+                r"W = k\left(\dfrac{1}{x_2} - \dfrac{1}{x_1}\right)",
+                r"\text{Si }x_2 > x_1:\ W < 0",
+            ],
+            "resaltar": ["area"],
+        },
+        {
+            "titulo": "b) El trabajo que usted hace",
+            "math": [
+                r"W_{\mathrm{usted}} = -W = k\left(\dfrac{1}{x_1} - \dfrac{1}{x_2}\right)",
+                r"\text{Si }x_2 > x_1:\ \text{positivo}",
+            ],
+            "text": ["Usted tira hacia afuera mientras la fuerza tira hacia adentro."],
+        },
+    ]
+    resultado_latex = r"W = k\left(\dfrac{1}{x_2}-\dfrac{1}{x_1}\right)\ (< 0\ \text{si }x_2 > x_1)"
