@@ -17,8 +17,8 @@ LOTE 4 (orden de la lista): 5.44, 5.45, 5.46, 5.47, 5.51
 LOTE 5 (orden de la lista): 5.56, 5.57, 5.58, 5.59, 5.60
 LOTE 6 (orden de la lista): 5.65, 5.66, 5.68, 5.72, 5.74
 LOTE 7 (orden de la lista): 5.77, 5.80, 5.84, 5.85, 5.87
-PENDIENTES cap5:
-    92, 100, 101, 103, 110, 112, 119, 127
+LOTE 8 (orden de la lista, final cap5): 5.92, 5.100, 5.101, 5.103, 5.110, 5.112, 5.119, 5.127
+CAPÍTULO 5 COMPLETO (43/43).
 """
 
 import numpy as np
@@ -1419,7 +1419,7 @@ class P5_56(ProblemaScene):
             "text": ["Cuanto más horizontal, mayor la tensión: la cuerda casi no puede quedar recta."],
         },
     ]
-    resultado_latex = r"N = 1.22\,mg, \qquad T = 0.700\,mg"
+    resultado_latex = r"T = 2.54\times10^3\ \mathrm{N}, \qquad \theta_{\min} = 1.01^\circ"
 
 
 class P5_65(ProblemaScene):
@@ -2325,3 +2325,529 @@ class P5_60(ProblemaScene):
         },
     ]
     resultado_latex = r"N = 1.22\,mg, \qquad T = 0.700\,mg"
+
+
+class P5_92(ProblemaScene):
+    numero = "5.92"
+    titulo = "Bloques en dos planos sin fricción"
+    subtitulo = "Segunda ley de Newton · doble rampa"
+    lista_datos = [
+        ("Masa en el plano de 30.0°:", r"100\ \mathrm{kg}"),
+        ("Masa en el plano de 53.1°:", r"50\ \mathrm{kg}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        A1 = p(-2.6, -0.8)
+        peak = p(0.61, 1.05)
+        A2 = p(2.0, -0.8)
+        self.f_linea(fig, "rampaI", A1, peak, color=self.BLUE, grosor=6)
+        self.f_linea(fig, "rampaD", A2, peak, color=self.BLUE, grosor=6)
+        self.f_linea(fig, "suelo", p(-2.9, -0.8), p(2.3, -0.8), color=self.MUTED, grosor=3)
+        self.f_polea(fig, "polea", peak, radio=0.3, color=self.BLUE)
+        u1 = np.array([np.cos(np.deg2rad(30.0)), np.sin(np.deg2rad(30.0)), 0.0])
+        u2 = np.array([-np.cos(np.deg2rad(53.1)), np.sin(np.deg2rad(53.1)), 0.0])
+        n1 = np.array([-np.sin(np.deg2rad(30.0)), np.cos(np.deg2rad(30.0)), 0.0])
+        n2 = np.array([-np.sin(np.deg2rad(53.1)), np.cos(np.deg2rad(53.1)), 0.0])
+        B1 = A1 + 1.8 * u1 + 0.40 * n1
+        B2 = A2 + 1.2 * u2 + 0.40 * n2
+        g1 = self.f_cuerpo(fig, "bloque1", B1, ancho=1.15, alto=0.7,
+                           color=self.BLUE, etiqueta=r"100")
+        g1[0].rotate(np.deg2rad(30.0), about_point=B1)
+        g2 = self.f_cuerpo(fig, "bloque2", B2, ancho=1.0, alto=0.65,
+                           color=self.GREEN, etiqueta=r"50")
+        g2[0].rotate(-np.deg2rad(53.1), about_point=B2)
+        self.f_linea(fig, "cuerda1", B1 + 0.62 * u1, peak, color=self.WHITE, grosor=4)
+        self.f_linea(fig, "cuerda2", B2 + 0.55 * u2, peak, color=self.WHITE, grosor=4)
+        self.f_vector(fig, "w1", B1, DOWN, 1.2, color=self.ORANGE,
+                      etiqueta=r"m_1g", lado=DOWN, etiqueta_size=20)
+        self.f_vector(fig, "w2", B2, DOWN, 1.0, color=self.ORANGE,
+                      etiqueta=r"m_2g", lado=DOWN, etiqueta_size=20)
+        self.f_vector(fig, "T1", B1 + 0.62 * u1, u1, 0.7, color=self.CYAN,
+                      etiqueta=r"T", lado=UP, etiqueta_size=22)
+        self.f_vector(fig, "T2", B2 + 0.55 * u2, u2, 0.7, color=self.CYAN,
+                      etiqueta=r"T", lado=UP, etiqueta_size=22)
+        self.f_vector(fig, "acc", B1 - 0.62 * u1, -u1, 0.75, color=self.RED,
+                      etiqueta=r"a", lado=DOWN, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Dos bloques unidos sobre dos rampas",
+            "revelar": ["rampaI", "rampaD", "suelo", "polea", "bloque1", "bloque2",
+                        "cuerda1", "cuerda2"],
+            "text": ["Sin fricción: solo compiten las componentes del peso."],
+        },
+        {
+            "titulo": "Comparar las tendencias al deslizamiento",
+            "revelar": ["w1", "w2"],
+            "math": [r"m_1 g\sin 30^\circ = 490\ \mathrm{N}, \quad m_2 g\sin 53.1^\circ = 392\ \mathrm{N}"],
+            "text": ["El bloque de 100 kg baja y el de 50 kg sube."],
+            "resaltar": ["w1", "w2"],
+        },
+        {
+            "titulo": "Aceleración del sistema",
+            "revelar": ["acc"],
+            "math": [
+                r"a = \dfrac{m_1 g\sin 30^\circ - m_2 g\sin 53.1^\circ}{m_1+m_2}",
+                r"a = \dfrac{98.0}{150} = 0.653\ \mathrm{m/s^2}",
+            ],
+            "resaltar": ["acc"],
+        },
+        {
+            "titulo": "Tensión en la cuerda",
+            "revelar": ["T1", "T2"],
+            "math": [r"T = m_2(g\sin 53.1^\circ + a) = 50(7.84+0.653) = 425\ \mathrm{N}"],
+            "resaltar": ["T1", "T2"],
+        },
+    ]
+    resultado_latex = r"a = 0.653\ \mathrm{m/s^2}, \qquad T = 425\ \mathrm{N}"
+
+
+class P5_100(ProblemaScene):
+    numero = "5.100"
+    titulo = "Acelerómetro de plataforma"
+    subtitulo = "Segunda ley de Newton · el ángulo mide la aceleración"
+    lista_datos = [
+        ("Masa colgante:", r"m_1 = 250\ \mathrm{kg}"),
+        ("Masa de la plataforma:", r"m_2 = 1250\ \mathrm{kg}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "suelo", p(-3.4, -1.4), p(3.0, -1.4), color=self.MUTED, grosor=4)
+        self.f_cuerpo(fig, "carro", p(-0.6, -0.85), ancho=1.6, alto=0.9,
+                      color=self.BLUE, etiqueta="carro")
+        O = p(-0.6, 0.35)
+        self.f_linea(fig, "techoC", p(-1.4, 0.35), p(0.2, 0.35), color=self.MUTED, grosor=3)
+        th = np.deg2rad(9.46)
+        bola_dir = np.array([np.sin(th), -np.cos(th), 0.0])
+        Bq = O + 1.3 * bola_dir
+        self.f_linea(fig, "hilo", O, Bq, color=self.WHITE, grosor=5)
+        self.f_cuerpo(fig, "bola", Bq, forma="punto", color=self.YELLOW)
+        self.f_angulo(fig, "theta", O, O + DOWN, Bq, radio=0.5,
+                      etiqueta=r"\theta", etiqueta_size=22)
+        self.f_vector(fig, "T", Bq, O - Bq, 0.9, color=self.CYAN,
+                      etiqueta=r"T", lado=RIGHT, etiqueta_size=22)
+        self.f_vector(fig, "w", Bq, DOWN, 0.8, color=self.ORANGE,
+                      etiqueta=r"mg", lado=LEFT, etiqueta_size=20)
+        self.f_vector(fig, "a", p(1.7, -0.85), RIGHT, 1.0, color=self.RED,
+                      etiqueta=r"a", lado=UP, etiqueta_size=24)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El sistema acelera y la bola se inclina",
+            "revelar": ["suelo", "carro", "techoC", "hilo", "bola", "theta"],
+            "text": ["La masa colgante tira de la plataforma; la bola indica cuánto acelera."],
+        },
+        {
+            "titulo": "Aceleración del sistema",
+            "revelar": ["a"],
+            "math": [r"a = \dfrac{m_1 g}{m_1+m_2} = \dfrac{(250)(9.80)}{1500} = 1.63\ \mathrm{m/s^2}"],
+            "resaltar": ["a"],
+        },
+        {
+            "titulo": "Ángulo de la bola",
+            "revelar": ["T", "w"],
+            "math": [r"\tan\theta = \dfrac{a}{g} \;\Rightarrow\; \theta = \arctan\dfrac{1.63}{9.80} = 9.46^\circ"],
+            "resaltar": ["T", "theta"],
+        },
+        {
+            "titulo": "Ángulo máximo posible",
+            "math": [r"a < g \;\Rightarrow\; \theta_{\max} = 45^\circ"],
+            "text": ["Se logra haciendo m₁ mucho mayor que m₂."],
+        },
+    ]
+    resultado_latex = r"\theta = 9.46^\circ, \qquad \theta_{\max} = 45^\circ"
+
+
+class P5_101(ProblemaScene):
+    numero = "5.101"
+    titulo = "Curva peraltada I"
+    subtitulo = "Segunda ley de Newton · peralte con fricción"
+    lista_datos = [
+        ("Radio:", r"R = 120\ \mathrm{m}"),
+        ("Rapidez de diseño:", r"v_0 = 20\ \mathrm{m/s}"),
+        ("Rapidez real:", r"v = 30\ \mathrm{m/s}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        th = np.deg2rad(18.8)
+        u = np.array([np.cos(th), np.sin(th), 0.0])
+        n = np.array([-np.sin(th), np.cos(th), 0.0])
+        A = p(-1.7, -0.65)
+        B = A + 3.4 * u
+        self.f_linea(fig, "calzada", A, B, color=self.WHITE, grosor=6)
+        self.f_linea(fig, "base", p(A[0], A[1]), p(B[0], A[1]), color=self.MUTED, grosor=3)
+        self.f_angulo(fig, "theta", A, A + u, A + RIGHT, radio=0.55,
+                      etiqueta=r"\theta", etiqueta_size=20)
+        centro = A + 1.5 * u + 0.48 * n
+        g = self.f_cuerpo(fig, "auto", centro, ancho=1.25, alto=0.72,
+                          color=self.BLUE)
+        g[0].rotate(th, about_point=centro)
+        self.f_texto(fig, "etAuto", "auto", centro + UP * 0.62, size=20, color=self.WHITE)
+        self.f_vector(fig, "N", centro, n, 1.4, color=self.CYAN,
+                      etiqueta=r"N", lado=RIGHT, etiqueta_size=24)
+        self.f_vector(fig, "w", centro, DOWN, 1.1, color=self.ORANGE,
+                      etiqueta=r"mg", lado=DOWN, etiqueta_size=22)
+        self.f_vector(fig, "fs", centro - 0.66 * u, -u, 0.75, color=self.YELLOW,
+                      etiqueta=r"f_s", lado=DOWN, etiqueta_size=20)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El peralte se diseñó para 20 m/s",
+            "revelar": ["calzada", "base", "auto", "etAuto", "theta"],
+            "math": [
+                r"\tan\theta = \dfrac{v_0^2}{gR} = \dfrac{(20)^2}{(9.80)(120)} = 0.340",
+                r"\theta = 18.8^\circ",
+            ],
+        },
+        {
+            "titulo": "A 30 m/s la fricción ayuda a girar",
+            "revelar": ["N", "w", "fs"],
+            "math": [
+                r"\mu_s = \dfrac{v^2/(gR) - \tan\theta}{1 + (v^2/(gR))\tan\theta}",
+                r"\dfrac{v^2}{gR} = \dfrac{900}{1176} = 0.765",
+                r"\mu_s = \dfrac{0.765-0.340}{1+0.260} = 0.337",
+            ],
+            "resaltar": ["fs"],
+        },
+    ]
+    resultado_latex = r"\mu_s = 0.337"
+
+
+class P5_103(ProblemaScene):
+    numero = "5.103"
+    titulo = "Bloques A, B y C conectados"
+    subtitulo = "Segunda ley de Newton · mesa, rampa y polea"
+    lista_datos = [
+        ("Peso de A y B:", r"25.0\ \mathrm{N}\ \text{cada uno}"),
+        ("Coef. de fricción:", r"\mu_k = 0.35"),
+        ("Rampa:", r"36.9^\circ"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        th = np.deg2rad(36.9)
+        u = np.array([np.cos(th), np.sin(th), 0.0])
+        A = p(-0.6, 0.0)
+        P = A + 2.6 * u
+        self.f_linea(fig, "mesa", p(-3.5, 0.0), p(-0.6, 0.0), color=self.MUTED, grosor=4)
+        self.f_linea(fig, "rampa", A, P, color=self.BLUE, grosor=6)
+        self.f_polea(fig, "polea", P, radio=0.3, color=self.BLUE)
+        cA = p(-2.5, 0.42)
+        self.f_cuerpo(fig, "bloqueA", cA, ancho=1.05, alto=0.68,
+                      color=self.BLUE, etiqueta="A")
+        n = np.array([-np.sin(th), np.cos(th), 0.0])
+        cB = A + 1.2 * u + 0.40 * n
+        g = self.f_cuerpo(fig, "bloqueB", cB, ancho=1.0, alto=0.65,
+                          color=self.GREEN, etiqueta="B")
+        g[0].rotate(th, about_point=cB)
+        mx = P[0] + 0.3
+        self.f_linea(fig, "cuerdaAB", p(-1.95, 0.42), cB - 0.55 * u,
+                     color=self.WHITE, grosor=4)
+        self.f_linea(fig, "cuerdaBP", cB + 0.55 * u, P, color=self.WHITE, grosor=4)
+        self.f_linea(fig, "cuerdaC", p(mx, P[1]), p(mx, 0.35), color=self.WHITE, grosor=4)
+        self.f_cuerpo(fig, "bloqueC", p(mx, 0.0), ancho=0.85, alto=0.6,
+                      color=self.ORANGE, etiqueta="C")
+        self.f_vector(fig, "TAB_A", p(-1.95, 0.42), RIGHT, 0.6, color=self.CYAN,
+                      etiqueta=r"T_{AB}", lado=UP, etiqueta_size=20)
+        self.f_vector(fig, "fk_A", cA + DOWN * 0.28, LEFT, 0.7, color=self.YELLOW,
+                      etiqueta=r"f_k", lado=DOWN, etiqueta_size=20)
+        self.f_vector(fig, "TBC_B", cB + 0.55 * u, u, 0.65, color=self.CYAN,
+                      etiqueta=r"T_{BC}", lado=UP, etiqueta_size=20)
+        self.f_vector(fig, "w_B", cB, DOWN, 0.85, color=self.ORANGE,
+                      etiqueta=r"w_B", lado=RIGHT, etiqueta_size=20)
+        self.f_vector(fig, "TBC_C", p(mx, 0.35), UP, 0.6, color=self.CYAN,
+                      etiqueta=r"T_{BC}", lado=LEFT, etiqueta_size=20)
+        self.f_vector(fig, "w_C", p(mx, 0.0), DOWN, 0.85, color=self.ORANGE,
+                      etiqueta=r"w_C", lado=LEFT, etiqueta_size=20)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "A en la mesa, B en la rampa, C colgando",
+            "revelar": ["mesa", "rampa", "polea", "bloqueA", "bloqueB", "bloqueC",
+                        "cuerdaAB", "cuerdaBP", "cuerdaC"],
+            "text": ["Los tres se mueven juntos a velocidad constante."],
+        },
+        {
+            "titulo": "Tensión entre A y B",
+            "revelar": ["TAB_A", "fk_A"],
+            "math": [r"T_{AB} = \mu_k w_A = 0.35(25.0) = 8.75\ \mathrm{N}"],
+            "resaltar": ["TAB_A"],
+        },
+        {
+            "titulo": "Peso del bloque C",
+            "revelar": ["TBC_B", "w_B", "TBC_C", "w_C"],
+            "math": [
+                r"w_C = T_{AB} + w_B\sin 36.9^\circ + \mu_k w_B\cos 36.9^\circ",
+                r"w_C = 8.75 + 15.0 + 7.00 = 30.8\ \mathrm{N}",
+            ],
+            "resaltar": ["w_C"],
+        },
+        {
+            "titulo": "Si se corta la cuerda entre A y B",
+            "math": [
+                r"a = \dfrac{w_C - w_B\sin 36.9^\circ - \mu_k w_B\cos 36.9^\circ}{(w_C+w_B)/g}",
+                r"a = \dfrac{8.75}{5.69} = 1.54\ \mathrm{m/s^2}",
+            ],
+        },
+    ]
+    resultado_latex = r"T_{AB} = 8.75\ \mathrm{N}, \quad w_C = 30.8\ \mathrm{N}, \quad a = 1.54\ \mathrm{m/s^2}"
+
+
+class P5_110(ProblemaScene):
+    numero = "5.110"
+    titulo = "Bloque girando con dos cuerdas"
+    subtitulo = "Segunda ley de Newton · rotación con dos tensiones"
+    lista_datos = [
+        ("Masa del bloque:", r"m = 4.00\ \mathrm{kg}"),
+        ("Cuerdas:", r"1.25\ \mathrm{m}\ \text{cada una}"),
+        ("Varilla:", r"2.00\ \mathrm{m}"),
+        ("Tensión superior:", r"T_1 = 80.0\ \mathrm{N}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        vx = -2.3
+        self.f_linea(fig, "varilla", p(vx, -2.35), p(vx, 2.35), color=self.MUTED, grosor=4)
+        sup = p(vx, 2.0)
+        inf = p(vx, -2.0)
+        B = p(-0.8, 0.0)
+        self.f_linea(fig, "cuerda1", sup, B, color=self.WHITE, grosor=5)
+        self.f_linea(fig, "cuerda2", inf, B, color=self.WHITE, grosor=5)
+        self.f_cuerpo(fig, "bloque", B, ancho=0.7, alto=0.6,
+                      color=self.BLUE, etiqueta="m")
+        self.f_angulo(fig, "theta", B, B + LEFT, sup, radio=0.55,
+                      etiqueta=r"\theta", etiqueta_size=22)
+        self.f_vector(fig, "T1", B, sup - B, 1.5, color=self.CYAN,
+                      etiqueta=r"T_1", lado=UP, etiqueta_size=24)
+        self.f_vector(fig, "T2", B, inf - B, 1.3, color=self.GREEN,
+                      etiqueta=r"T_2", lado=DOWN, etiqueta_size=24)
+        self.f_vector(fig, "w", B, DOWN, 0.9, color=self.ORANGE,
+                      etiqueta=r"mg", lado=RIGHT, etiqueta_size=20)
+        self.f_vector(fig, "ac", B + UP * 0.3, LEFT, 0.9, color=self.RED,
+                      etiqueta=r"a_c", lado=UP, etiqueta_size=20)
+        self.f_linea(fig, "radio", p(vx, 0.0), B, color=self.GREEN,
+                     grosor=2, discontinuo=True, etiqueta=r"r", lado=DOWN,
+                     etiqueta_size=20)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El bloque gira alrededor de la varilla",
+            "revelar": ["varilla", "cuerda1", "cuerda2", "bloque", "theta", "radio"],
+            "math": [
+                r"r = \sqrt{1.25^2-1.00^2} = 0.750\ \mathrm{m}",
+                r"\sin\theta = 0.800, \quad \cos\theta = 0.600",
+            ],
+        },
+        {
+            "titulo": "Equilibrio vertical: cuerda inferior",
+            "revelar": ["T1", "T2", "w"],
+            "math": [
+                r"T_1\sin\theta - T_2\sin\theta = mg",
+                r"T_2 = 80.0 - 49.0 = 31.0\ \mathrm{N}",
+            ],
+            "resaltar": ["T2"],
+        },
+        {
+            "titulo": "Dinámica radial: revoluciones",
+            "revelar": ["ac"],
+            "math": [
+                r"(T_1+T_2)\cos\theta = m\omega^2 r",
+                r"\omega = 4.71\ \mathrm{rad/s} \;\Rightarrow\; 45.0\ \mathrm{rpm}",
+            ],
+            "resaltar": ["ac"],
+        },
+        {
+            "titulo": "Cuando la cuerda inferior se afloja",
+            "math": [
+                r"T_1\sin\theta = mg \;\Rightarrow\; T_1 = 49.0\ \mathrm{N}",
+                r"\omega = 3.13\ \mathrm{rad/s} \;\Rightarrow\; 29.9\ \mathrm{rpm}",
+            ],
+        },
+    ]
+    resultado_latex = r"T_2 = 31.0\ \mathrm{N}, \quad 45.0\ \mathrm{rpm}, \quad 29.9\ \mathrm{rpm}"
+
+
+class P5_112(ProblemaScene):
+    numero = "5.112"
+    titulo = "Piedra lanzada hacia arriba en agua"
+    subtitulo = "Resistencia cuadrática del fluido"
+    lista_datos = [
+        ("Rapidez terminal:", r"v_t = 2.0\ \mathrm{m/s}"),
+        ("Rapidez inicial:", r"v_0 = 6.0\ \mathrm{m/s}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        tanque = Rectangle(width=3.4, height=3.6, color=self.BLUE, stroke_width=4,
+                           fill_color=self.BLUE, fill_opacity=0.15).move_to(p(-1.3, -0.2))
+        fig.registrar("tanque", tanque, lambda m: Create(m))
+        self.f_cuerpo(fig, "piedra", p(-1.5, -1.3), forma="punto", color=self.WHITE)
+        self.f_vector(fig, "v", p(-1.5, -1.3), UP, 1.2, color=self.CYAN,
+                      etiqueta=r"v", lado=RIGHT, etiqueta_size=24)
+        self.f_vector(fig, "drag", p(-1.5, -1.3), DOWN, 0.9, color=self.YELLOW,
+                      etiqueta=r"F_d", lado=RIGHT, etiqueta_size=20)
+        self.f_linea(fig, "h1", p(-0.3, -1.3), p(-0.3, 0.55),
+                     color=self.GREEN, grosor=2, discontinuo=True,
+                     etiqueta=r"1.84", lado=RIGHT, etiqueta_size=20)
+        self.f_linea(fig, "h2", p(-0.75, -1.3), p(-0.75, -0.8),
+                     color=self.YELLOW, grosor=3,
+                     etiqueta=r"0.47", lado=LEFT, etiqueta_size=20)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "La piedra sube frenada por el agua",
+            "revelar": ["tanque", "piedra", "v", "drag"],
+            "text": ["La resistencia crece con la rapidez: frena más al inicio."],
+        },
+        {
+            "titulo": "Sin resistencia del fluido",
+            "revelar": ["h1"],
+            "math": [
+                r"h = \dfrac{v_0^2}{2g} = \dfrac{(6.0)^2}{2(9.80)} = 1.84\ \mathrm{m}",
+                r"t = \dfrac{v_0}{g} = 0.612\ \mathrm{s}",
+            ],
+            "resaltar": ["h1"],
+        },
+        {
+            "titulo": "Con resistencia del fluido",
+            "revelar": ["h2"],
+            "math": [
+                r"t = \dfrac{v_t}{g}\arctan\dfrac{v_0}{v_t} = 0.255\ \mathrm{s}",
+                r"h = \dfrac{v_t^2}{2g}\ln\!\left(1+\dfrac{v_0^2}{v_t^2}\right) = 0.470\ \mathrm{m}",
+            ],
+            "text": ["Ambas respuestas disminuyen por la resistencia del fluido."],
+            "resaltar": ["h2"],
+        },
+    ]
+    resultado_latex = r"h:\ 1.84 \to 0.470\ \mathrm{m}; \qquad t:\ 0.612 \to 0.255\ \mathrm{s}"
+
+
+class P5_119(ProblemaScene):
+    numero = "5.119"
+    titulo = "Cuenta sobre un aro giratorio"
+    subtitulo = "Segunda ley de Newton · equilibrio en marco giratorio"
+    lista_datos = [
+        ("Radio del aro:", r"R = 0.100\ \mathrm{m}"),
+        ("Rotación:", r"4.00\ \mathrm{rev/s}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        centro = p(0.0, 0.1)
+        radio = 1.9
+        aro = Circle(radius=radio, color=self.BLUE, stroke_width=7).move_to(centro)
+        fig.registrar("aro", aro, lambda m: Create(m))
+        beta = np.deg2rad(81.1)
+        Cb = centro + radio * np.array([np.sin(beta), -np.cos(beta), 0.0])
+        self.f_cuerpo(fig, "cuenta", Cb, forma="punto", color=self.YELLOW)
+        self.f_cuerpo(fig, "fondo", centro + DOWN * radio, forma="punto", color=self.MUTED)
+        self.f_vector(fig, "N", Cb, centro - Cb, 1.05, color=self.CYAN,
+                      etiqueta=r"N", lado=UP, etiqueta_size=24)
+        self.f_vector(fig, "w", Cb, DOWN, 0.85, color=self.ORANGE,
+                      etiqueta=r"mg", lado=RIGHT, etiqueta_size=20)
+        self.f_angulo(fig, "beta", centro, centro + DOWN, Cb, radio=0.55,
+                      etiqueta=r"\beta", etiqueta_size=24)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El aro gira y la cuenta sube por la pared",
+            "revelar": ["aro", "cuenta"],
+            "text": ["La normal de la pared provee la fuerza centrípeta."],
+        },
+        {
+            "titulo": "Equilibrio en el marco giratorio",
+            "revelar": ["N", "w", "beta"],
+            "math": [
+                r"N\cos\beta = mg, \qquad N\sin\beta = m\omega^2 R\sin\beta",
+                r"\cos\beta = \dfrac{g}{\omega^2 R}",
+            ],
+            "resaltar": ["N"],
+        },
+        {
+            "titulo": "Ángulo a 4.00 rev/s",
+            "math": [
+                r"\omega = 4.00(2\pi) = 25.1\ \mathrm{rad/s}",
+                r"\cos\beta = \dfrac{9.80}{(25.1)^2(0.100)} = 0.155 \;\Rightarrow\; \beta = 81.1^\circ",
+            ],
+            "resaltar": ["beta"],
+        },
+        {
+            "titulo": "A 1.00 rev/s",
+            "ocultar": ["cuenta"],
+            "revelar": ["fondo"],
+            "math": [r"\cos\beta = \dfrac{9.80}{(6.28)^2(0.100)} = 2.48 > 1"],
+            "text": ["No hay solución: la cuenta permanece en el fondo del aro."],
+        },
+    ]
+    resultado_latex = r"\beta = 81.1^\circ; \qquad \text{a }1.00\ \mathrm{rev/s queda abajo}"
+
+
+class P5_127(ProblemaScene):
+    numero = "5.127"
+    titulo = "Esfera que oscila tras cortar una cuerda"
+    subtitulo = "Tensión antes y durante la oscilación"
+    lista_datos = [("Ángulo de la cuerda de soporte:", r"\beta")]
+
+    def crear_figura(self):
+        fig = Figura()
+        O = p(0.0, 1.9)
+        beta = np.deg2rad(30.0)
+        L = 2.0
+        A = O + L * np.array([-np.sin(beta), -np.cos(beta), 0.0])
+        B = O + L * np.array([np.sin(beta), -np.cos(beta), 0.0])
+        self.f_linea(fig, "soporte", p(-2.5, 1.9), p(2.5, 1.9), color=self.MUTED, grosor=3)
+        self.f_cuerpo(fig, "pivote", O, forma="punto", color=self.WHITE)
+        self.f_linea(fig, "cuerdaA", O, A, color=self.WHITE, grosor=5)
+        self.f_linea(fig, "cuerdaH", A, p(-2.5, A[1]), color=self.WHITE, grosor=4)
+        self.f_linea(fig, "cuerdaB", O, B, color=self.GREEN, grosor=5)
+        self.f_cuerpo(fig, "bolaA", A, ancho=0.6, alto=0.5,
+                      color=self.BLUE, etiqueta="A")
+        self.f_cuerpo(fig, "bolaB", B, ancho=0.6, alto=0.5,
+                      color=self.GREEN, etiqueta="B")
+        arco = Arc(radius=L, start_angle=(270 - 30) * DEGREES, angle=60 * DEGREES,
+                   color=self.YELLOW, stroke_width=3).move_to(O)
+        fig.registrar("trayectoria", arco, lambda m: Create(m))
+        self.f_angulo(fig, "beta", O, O + DOWN, A, radio=0.55,
+                      etiqueta=r"\beta", etiqueta_size=22)
+        self.f_vector(fig, "TA", A, O - A, 0.95, color=self.CYAN,
+                      etiqueta=r"T_A", lado=LEFT, etiqueta_size=24)
+        self.f_vector(fig, "TB", B, O - B, 0.9, color=self.CYAN,
+                      etiqueta=r"T_B", lado=RIGHT, etiqueta_size=24)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "La esfera está sostenida en A",
+            "revelar": ["soporte", "pivote", "cuerdaA", "cuerdaH", "bolaA", "beta"],
+            "text": ["Una cuerda horizontal mantiene a la esfera fuera de la vertical."],
+        },
+        {
+            "titulo": "En A (antes de cortar la cuerda horizontal)",
+            "revelar": ["TA"],
+            "math": [r"T_A\cos\beta = mg \;\Rightarrow\; T_A = \dfrac{mg}{\cos\beta}"],
+            "resaltar": ["TA"],
+        },
+        {
+            "titulo": "Se corta y oscila hasta B (v = 0)",
+            "ocultar": ["cuerdaH"],
+            "revelar": ["trayectoria", "bolaB", "TB"],
+            "math": [r"T_B = mg\cos\beta"],
+            "text": ["En el extremo la rapidez es cero: solo queda la componente radial."],
+            "resaltar": ["TB"],
+        },
+        {
+            "titulo": "Razón entre las tensiones",
+            "math": [r"\dfrac{T_B}{T_A} = \dfrac{mg\cos\beta}{mg/\cos\beta} = \cos^2\beta"],
+        },
+    ]
+    resultado_latex = r"\dfrac{T_B}{T_A} = \cos^2\beta"
