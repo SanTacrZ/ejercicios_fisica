@@ -1,0 +1,12 @@
+# Solo se versiona código de programación
+media/
+__pycache__/
+*.pdf
+*.docx
+*.jpeg
+*.jpg
+*.png
+*.mp4
+pag-*.png
+e5*.png
+sears.txt
