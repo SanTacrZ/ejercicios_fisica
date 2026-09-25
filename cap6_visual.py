@@ -11,8 +11,9 @@ Render del lote:
 LOTE 1 (orden de la lista): 6.1, 6.4, 6.5, 6.6, 6.8
 LOTE 2 (orden de la lista): 6.12, 6.14, 6.19, 6.20, 6.21
 LOTE 3 (orden de la lista): 6.33, 6.34, 6.35, 6.37, 6.43
+LOTE 4 (orden de la lista): 6.45, 6.46, 6.52, 6.56, 6.60
 PENDIENTES cap6:
-    45, 46, 52, 56, 60, 61, 65, 66, 69, 71, 72, 75, 76, 80, 81, 84, 85, 87, 94, 97
+    61, 65, 66, 69, 71, 72, 75, 76, 80, 81, 84, 85, 87, 94, 97
 """
 
 import numpy as np
@@ -931,3 +932,249 @@ class P6_43(Cap6Scene):
         },
     ]
     resultado_latex = r"v_a = 2.83\ \mathrm{m/s}, \qquad v_b = 2.40\ \mathrm{m/s}"
+
+
+class P6_45(Cap6Scene):
+    numero = "6.45"
+    titulo = "Deslizador lanzado por un resorte en riel inclinado"
+    lista_datos = [
+        ("Masa del deslizador:", r"m = 0.0900\ \mathrm{kg}"),
+        ("Constante del resorte:", r"k = 640\ \mathrm{N/m}"),
+        ("Inclinación del riel:", r"40.0^\circ"),
+        ("Alcance máximo:", r"d_{\max} = 1.80\ \mathrm{m}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        th = np.deg2rad(40.0)
+        u = np.array([np.cos(th), np.sin(th), 0.0])
+        n = np.array([-np.sin(th), np.cos(th), 0.0])
+        A = p(-3.0, -1.5)
+        B = A + 3.4 * u
+        self.f_linea(fig, "riel", A, B, color=self.BLUE, grosor=6)
+        self.f_linea(fig, "base", p(A[0], A[1]), p(B[0], A[1]), color=self.MUTED, grosor=3)
+        self.f_angulo(fig, "ang40", A, A + u, A + RIGHT, radio=0.6,
+                      etiqueta=r"40^\circ", etiqueta_size=20)
+        fig.registrar("resorte", resorte(A, A + 0.7 * u), lambda m: Create(m))
+        C = A + 1.02 * u + 0.30 * n
+        g = self.f_cuerpo(fig, "deslizador", C, ancho=0.9, alto=0.6,
+                          color=self.GREEN, etiqueta="m")
+        g[0].rotate(th, about_point=C)
+        self.f_linea(fig, "marcaMax", A + 1.8 * u - 0.25 * n, A + 1.8 * u + 0.25 * n,
+                     color=self.GREEN, grosor=3,
+                     etiqueta=r"1.80", lado=UP, etiqueta_size=20)
+        self.f_linea(fig, "marca08", A + 0.8 * u - 0.25 * n, A + 0.8 * u + 0.25 * n,
+                     color=self.YELLOW, grosor=3,
+                     etiqueta=r"0.80", lado=DOWN, etiqueta_size=20)
+        flecha = DoubleArrow(A - 0.35 * n, A + 0.7 * u - 0.35 * n,
+                             color=self.YELLOW, stroke_width=3, tip_length=0.15)
+        fig.registrar("comp", flecha, lambda m: Create(m))
+        self.f_texto(fig, "etX", r"x = ?", (A + 0.35 * u - 1.0 * n), size=24,
+                     color=self.YELLOW, math=True)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El resorte dispara al deslizador riel arriba",
+            "revelar": ["riel", "base", "ang40", "resorte", "deslizador",
+                        "marcaMax", "marca08", "comp", "etX"],
+            "text": ["Sin fricción: la energía elástica se reparte entre altura y rapidez."],
+        },
+        {
+            "titulo": "a) Compresión original del resorte",
+            "math": [
+                r"\tfrac12 kx^2 = mgd\sin 40^\circ",
+                r"x = \sqrt{\dfrac{2(0.0900)(9.80)(1.80)(0.643)}{640}}",
+                r"x = 5.65\times10^{-2}\ \mathrm{m} = 5.65\ \mathrm{cm}",
+            ],
+            "resaltar": ["comp", "marcaMax"],
+        },
+        {
+            "titulo": "b) A 0.80 m ya perdió contacto",
+            "math": [
+                r"K = \tfrac12 kx^2 - mg(0.80)\sin 40^\circ",
+                r"K = 1.02 - 0.454 = 0.57\ \mathrm{J}",
+            ],
+            "text": ["El resorte se estira solo 5.65 cm: a 0.80 m ya va por inercia."],
+            "resaltar": ["marca08"],
+        },
+    ]
+    resultado_latex = r"x = 5.65\ \mathrm{cm}, \qquad K(0.80) = 0.57\ \mathrm{J}"
+
+
+class P6_46(Cap6Scene):
+    numero = "6.46"
+    titulo = "Ladrillo lanzado por un resorte vertical"
+    lista_datos = [
+        ("Masa del ladrillo:", r"m = 1.80\ \mathrm{kg}"),
+        ("Constante del resorte:", r"k = 450\ \mathrm{N/m}"),
+        ("Altura deseada:", r"h = 3.6\ \mathrm{m}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "suelo", p(-2.8, -1.8), p(2.4, -1.8), color=self.MUTED, grosor=4)
+        fig.registrar("resorte", resorte(p(0.0, -1.8), p(0.0, -0.9), vueltas=8),
+                       lambda m: Create(m))
+        self.f_cuerpo(fig, "ladrillo", p(0.0, -0.55), ancho=1.0, alto=0.6,
+                      color=self.ORANGE, etiqueta="ladrillo")
+        self.f_linea(fig, "h", p(1.3, -1.8), p(1.3, 1.6),
+                     color=self.GREEN, grosor=2, discontinuo=True,
+                     etiqueta=r"3.6", lado=RIGHT, etiqueta_size=22)
+        self.f_vector(fig, "v", p(0.0, -0.55), UP, 1.0, color=self.CYAN,
+                      etiqueta=r"v", lado=RIGHT, etiqueta_size=24)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El resorte vertical impulsa al ladrillo",
+            "revelar": ["suelo", "resorte", "ladrillo", "h"],
+            "text": ["Toda la energía elástica debe alcanzar para la altura deseada."],
+        },
+        {
+            "titulo": "Compresión necesaria",
+            "revelar": ["v"],
+            "math": [
+                r"\tfrac12 kx^2 = mgh",
+                r"x = \sqrt{\dfrac{2(1.80)(9.80)(3.6)}{450}} = 0.531\ \mathrm{m}",
+            ],
+            "resaltar": ["resorte", "h"],
+        },
+    ]
+    resultado_latex = r"x = 0.531\ \mathrm{m}"
+
+
+class P6_52(Cap6Scene):
+    numero = "6.52"
+    titulo = "Potencia media de la fricción"
+    lista_datos = [
+        ("Masa de la piedra:", r"m = 20.0\ \mathrm{kg}"),
+        ("Rapidez inicial:", r"v_0 = 8.00\ \mathrm{m/s}"),
+        ("Fricción cinética:", r"\mu_k = 0.200"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "piso", p(-3.3, 0.0), p(3.3, 0.0), color=self.MUTED, grosor=4)
+        self.f_cuerpo(fig, "piedra", p(-1.6, 0.4), ancho=0.85, alto=0.7,
+                      color=self.BLUE, etiqueta="piedra")
+        self.f_vector(fig, "v0", p(-1.175, 0.4), RIGHT, 1.3, color=self.CYAN,
+                      etiqueta=r"v_0", lado=UP, etiqueta_size=24)
+        self.f_vector(fig, "fk", p(-2.025, 0.4), LEFT, 1.1, color=self.YELLOW,
+                      etiqueta=r"f_k", lado=UP, etiqueta_size=24)
+        self.f_linea(fig, "d", p(-1.6, -0.6), p(1.7, -0.6),
+                     color=self.GREEN, grosor=2, discontinuo=True,
+                     etiqueta=r"d", lado=DOWN, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "La piedra frena hasta detenerse",
+            "revelar": ["piso", "piedra", "v0", "fk"],
+            "text": ["La fricción disipa toda la energía cinética como calor."],
+        },
+        {
+            "titulo": "Distancia y tiempo de frenado",
+            "revelar": ["d"],
+            "math": [
+                r"d = \dfrac{v_0^2}{2\mu_k g} = \dfrac{64.0}{3.92} = 16.3\ \mathrm{m}",
+                r"t = \dfrac{v_0}{\mu_k g} = \dfrac{8.00}{1.96} = 4.08\ \mathrm{s}",
+            ],
+            "resaltar": ["d"],
+        },
+        {
+            "titulo": "Potencia media disipada",
+            "math": [
+                r"P = \dfrac{W}{t} = \dfrac{-640\ \mathrm{J}}{4.08\ \mathrm{s}}",
+                r"P = -157\ \mathrm{W}",
+            ],
+            "text": ["157 W salen del movimiento y calientan piedra y piso."],
+        },
+    ]
+    resultado_latex = r"P = -157\ \mathrm{W}\ (\text{157 W disipados})"
+
+
+class P6_56(Cap6Scene):
+    numero = "6.56"
+    titulo = "Cuántos pasajeros sube el elevador"
+    lista_datos = [
+        ("Masa del elevador:", r"600\ \mathrm{kg}"),
+        ("Altura:", r"20.0\ \mathrm{m}\ \text{en }16.0\ \mathrm{s}"),
+        ("Potencia del motor:", r"40\ \mathrm{hp}"),
+        ("Masa por pasajero:", r"65.0\ \mathrm{kg}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "muroI", p(-1.9, -2.2), p(-1.9, 2.2), color=self.MUTED, grosor=3)
+        self.f_linea(fig, "muroD", p(1.9, -2.2), p(1.9, 2.2), color=self.MUTED, grosor=3)
+        self.f_cuerpo(fig, "cabina", p(0.0, -0.3), ancho=2.0, alto=1.7,
+                      color=self.BLUE, etiqueta="elevador")
+        for i in range(3):
+            self.f_cuerpo(fig, f"pas{i}", p(-0.55 + 0.55 * i, -0.75),
+                          forma="punto", color=self.YELLOW)
+        self.f_vector(fig, "v", p(1.45, -0.3), UP, 1.1, color=self.CYAN,
+                      etiqueta=r"v", lado=RIGHT, etiqueta_size=24)
+        self.f_linea(fig, "h", p(-2.35, -1.6), p(-2.35, 0.9),
+                     color=self.GREEN, grosor=2, discontinuo=True,
+                     etiqueta=r"20", lado=LEFT, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Sube a rapidez constante",
+            "revelar": ["muroI", "muroD", "cabina", "pas0", "pas1", "pas2", "h"],
+            "math": [r"v = \dfrac{20.0}{16.0} = 1.25\ \mathrm{m/s}"],
+        },
+        {
+            "titulo": "La potencia limita el peso total",
+            "revelar": ["v"],
+            "math": [
+                r"P = (600 + 65n)gv \le 40\,\mathrm{hp} = 29840\ \mathrm{W}",
+                r"600 + 65n \le \dfrac{29840}{(9.80)(1.25)} = 2436",
+                r"n \le 28.2 \;\Rightarrow\; 28\ \text{pasajeros}",
+            ],
+            "resaltar": ["v"],
+        },
+    ]
+    resultado_latex = r"28\ \text{pasajeros como máximo}"
+
+
+class P6_60(Cap6Scene):
+    numero = "6.60"
+    titulo = "Trabajo de una fuerza que crece con x"
+    lista_datos = [
+        ("Desplazamiento:", r"x = 0 \to 6.9\ \mathrm{m}"),
+        ("Fuerza aplicada:", r"F_x = -[20.0 + 3.0x]\ \mathrm{N}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        axes = self.f_grafica(
+            fig, "grafica", [lambda x: -(20.0 + 3.0 * x)],
+            x_range=[0, 7, 1], y_range=[-45, 5, 10],
+            x_label="x\\,(\\mathrm{m})", y_label="F_x\\,(\\mathrm{N})",
+            ancho=4.4, alto=3.0, centro=(0.0, -0.2),
+        )
+        plot = fig.mob("grafica_c0")
+        area = axes.get_area(plot, x_range=[0, 6.9], color=self.RED, opacity=0.3)
+        fig.registrar("area", area, lambda m: FadeIn(m))
+        return fig
+
+    pasos = [
+        {
+            "titulo": "La fuerza se opone y crece con x",
+            "revelar": ["grafica_ejes", "grafica_c0"],
+            "text": ["El área queda bajo el eje: el trabajo será negativo."],
+        },
+        {
+            "titulo": "Trabajo como integral (área)",
+            "revelar": ["area"],
+            "math": [
+                r"W = \int_0^{6.9}-(20.0+3.0x)\,dx = -\left[20x + 1.5x^2\right]_0^{6.9}",
+                r"W = -(138 + 71.4) = -209\ \mathrm{J}",
+            ],
+            "resaltar": ["area"],
+        },
+    ]
+    resultado_latex = r"W = -209\ \mathrm{J}"
