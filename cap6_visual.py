@@ -9,8 +9,9 @@ Render del lote:
     manim -ql cap6_visual.py
 
 LOTE 1 (orden de la lista): 6.1, 6.4, 6.5, 6.6, 6.8
+LOTE 2 (orden de la lista): 6.12, 6.14, 6.19, 6.20, 6.21
 PENDIENTES cap6:
-    12, 14, 19, 20, 21, 33, 34, 35, 37, 43, 45, 46, 52, 56,
+    33, 34, 35, 37, 43, 45, 46, 52, 56,
     60, 61, 65, 66, 69, 71, 72, 75, 76, 80, 81, 84, 85, 87, 94, 97
 """
 
@@ -327,3 +328,329 @@ class P6_8(Cap6Scene):
         },
     ]
     resultado_latex = r"W = -150\ \mathrm{J}"
+
+
+class P6_12(Cap6Scene):
+    numero = "6.12"
+    titulo = "Trabajo de una fuerza en componentes"
+    lista_datos = [
+        ("Fuerza aplicada:", r"\vec F = (-68.0\ \mathrm{N})\hat\imath + (36.0\ \mathrm{N})\hat\jmath"),
+        ("Masa del automóvil:", r"m = 380\ \mathrm{kg}"),
+        ("Desplazamiento:", r"48.0\ \mathrm{m}\ \text{a }240^\circ"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_ejes(fig, "ejes", p(-1.6, -1.2), largo_x=2.6, largo_y=2.2,
+                    etiqueta_x="x", etiqueta_y="y")
+        O = p(-1.6, -1.2)
+        fdir = np.array([-68.0, 36.0, 0.0])
+        sdir = np.array([np.cos(np.deg2rad(240.0)), np.sin(np.deg2rad(240.0)), 0.0])
+        self.f_vector(fig, "F", O, fdir, 1.7, color=self.RED,
+                      etiqueta=r"\vec F", lado=LEFT, etiqueta_size=26)
+        self.f_vector(fig, "s", O, sdir, 1.55, color=self.CYAN,
+                      etiqueta=r"\vec s", lado=DOWN, etiqueta_size=26)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Fuerza y desplazamiento en el plano",
+            "revelar": ["ejes", "F", "s"],
+            "text": ["El desplazamiento forma 240° con el eje +x."],
+        },
+        {
+            "titulo": "Componentes del desplazamiento",
+            "math": [
+                r"s_x = 48\cos 240^\circ = -24.0\ \mathrm{m}",
+                r"s_y = 48\sin 240^\circ = -41.6\ \mathrm{m}",
+            ],
+        },
+        {
+            "titulo": "Trabajo como producto punto",
+            "math": [
+                r"W = F_x s_x + F_y s_y = (-68)(-24.0) + (36)(-41.6)",
+                r"W = 1632 - 1496 = 136\ \mathrm{J}",
+            ],
+            "resaltar": ["F", "s"],
+        },
+    ]
+    resultado_latex = r"W = 136\ \mathrm{J}"
+
+
+class P6_14(Cap6Scene):
+    numero = "6.14"
+    titulo = "Trabajo y rapidez en tres puntos"
+    lista_datos = [
+        ("Masa del libro:", r"m = 1.50\ \mathrm{kg}"),
+        ("Rapidez en A:", r"v_A = 3.21\ \mathrm{m/s}"),
+        ("Rapidez en B:", r"v_B = 1.25\ \mathrm{m/s}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "pista", p(-3.4, 0.6), p(3.4, 0.6), color=self.MUTED, grosor=4)
+        for x, nombre, et in [(-2.2, "tA", "A"), (0.0, "tB", "B"), (2.2, "tC", "C")]:
+            self.f_linea(fig, nombre, p(x, 0.6), p(x, 0.25), color=self.MUTED, grosor=2)
+            self.f_texto(fig, "et" + nombre, et, (x, -0.05, 0), size=22, color=self.WHITE)
+        self.f_cuerpo(fig, "libro", p(-2.2, 1.0), ancho=0.9, alto=0.55,
+                      color=self.BLUE, etiqueta="libro")
+        self.f_vector(fig, "vA", p(-2.2, 1.0), RIGHT, 1.2, color=self.CYAN,
+                      etiqueta=r"v_A", lado=DOWN, etiqueta_size=22)
+        self.f_vector(fig, "vB", p(0.0, 1.0), RIGHT, 0.5, color=self.CYAN,
+                      etiqueta=r"v_B", lado=DOWN, etiqueta_size=22)
+        for x, h, nombre, et, col in [(-1.8, 2.47, "KA", r"K_A", self.CYAN),
+                                      (-0.3, 0.37, "KB", r"K_B", self.GREEN),
+                                      (1.2, 0.14, "KC", r"K_C", self.YELLOW)]:
+            barra = Rectangle(width=0.7, height=max(h, 0.06), color=col,
+                              stroke_width=2, fill_color=col, fill_opacity=0.5)
+            barra.move_to(np.array([x, -2.6 + max(h, 0.06) / 2, 0.0]))
+            fig.registrar(nombre, barra, lambda m: FadeIn(m, shift=0.1 * UP))
+            self.f_texto(fig, "et" + nombre, et, (x, -2.25, 0), size=20,
+                         color=col, math=True)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El libro frena de A hacia C",
+            "revelar": ["pista", "tA", "ettA", "tB", "ettB", "tC", "ettC",
+                        "libro", "vA", "vB"],
+            "text": ["La fricción hace trabajo negativo: la energía cinética disminuye."],
+        },
+        {
+            "titulo": "Trabajo entre A y B",
+            "revelar": ["KA", "etKA", "KB", "etKB"],
+            "math": [
+                r"W_{AB} = K_B - K_A = \tfrac12(1.50)(1.25^2 - 3.21^2)",
+                r"W_{AB} = -6.56\ \mathrm{J}",
+            ],
+            "resaltar": ["KA", "KB"],
+        },
+        {
+            "titulo": "De B a C con −0.750 J",
+            "revelar": ["KC", "etKC"],
+            "math": [
+                r"K_C = K_B + W_{BC} = 1.17 - 0.750 = 0.422\ \mathrm{J}",
+                r"v_C = \sqrt{2K_C/m} = 0.750\ \mathrm{m/s}",
+            ],
+            "resaltar": ["KC"],
+        },
+        {
+            "titulo": "Si el trabajo fuera +0.750 J",
+            "math": [
+                r"K_C = 1.17 + 0.750 = 1.92\ \mathrm{J}",
+                r"v_C = 1.60\ \mathrm{m/s}",
+            ],
+        },
+    ]
+    resultado_latex = r"W_{AB} = -6.56\ \mathrm{J}, \quad v_C = 0.750\ \mathrm{m/s}\ (\text{o }1.60)"
+
+
+class P6_19(Cap6Scene):
+    numero = "6.19"
+    titulo = "Teorema trabajo-energía en cinco casos"
+    lista_datos = [
+        ("Secuoya:", r"h = 95.0\ \mathrm{m}"),
+        ("Roca del volcán:", r"h = 525\ \mathrm{m}"),
+        ("Esquiadora:", r"v_0 = 5.00\ \mathrm{m/s},\ \mu_k = 0.220"),
+        ("Trineo en colina 25°:", r"v_0 = 12.0\ \mathrm{m/s}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "suelo", p(-3.5, -1.6), p(3.5, -1.6), color=self.MUTED, grosor=3)
+        self.f_linea(fig, "tronco", p(-2.9, -1.6), p(-2.9, 0.2), color=self.MUTED, grosor=3)
+        self.f_cuerpo(fig, "rama", p(-2.9, 0.6), forma="punto", color=self.GREEN)
+        self.f_linea(fig, "h95", p(-3.25, -1.6), p(-3.25, 0.6),
+                     color=self.GREEN, grosor=2, discontinuo=True,
+                     etiqueta=r"95", lado=LEFT, etiqueta_size=20)
+        poly = Polygon(p(-1.75, -1.6), p(-0.65, -1.6), p(-1.2, -0.5),
+                       color=self.MUTED, stroke_width=3, fill_opacity=0)
+        fig.registrar("volcan", poly, lambda m: Create(m))
+        self.f_cuerpo(fig, "roca", p(-1.2, 0.1), forma="punto", color=self.ORANGE)
+        self.f_vector(fig, "vRoca", p(-1.2, 0.1), UP, 0.7, color=self.CYAN,
+                      etiqueta=r"v_0", lado=RIGHT, etiqueta_size=20)
+        self.f_linea(fig, "h525", p(-0.45, -1.6), p(-0.45, 0.1),
+                     color=self.ORANGE, grosor=2, discontinuo=True,
+                     etiqueta=r"525", lado=RIGHT, etiqueta_size=20)
+        self.f_linea(fig, "rugoso", p(0.3, -1.6), p(1.5, -1.6), color=self.YELLOW, grosor=6)
+        self.f_texto(fig, "mu", r"\mu_k", (0.9, -2.0, 0), size=22, color=self.YELLOW, math=True)
+        self.f_cuerpo(fig, "esquiadora", p(0.6, -1.2), forma="punto", color=self.CYAN)
+        self.f_vector(fig, "vE", p(0.6, -1.2), RIGHT, 0.9, color=self.CYAN,
+                      etiqueta=r"5.00", lado=UP, etiqueta_size=20)
+        u = np.array([np.cos(np.deg2rad(25.0)), np.sin(np.deg2rad(25.0)), 0.0])
+        base = p(1.9, -1.6)
+        tope = base + 1.2 * u
+        self.f_linea(fig, "colina", base, tope, color=self.BLUE, grosor=5)
+        self.f_angulo(fig, "ang25", base, base + RIGHT, tope, radio=0.4,
+                      etiqueta=r"25^\circ", etiqueta_size=18)
+        S = base + 0.45 * u
+        self.f_cuerpo(fig, "trineo", S, forma="punto", color=self.RED)
+        self.f_vector(fig, "vT", S, u, 0.8, color=self.RED,
+                      etiqueta=r"12.0", lado=UP, etiqueta_size=20)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Cinco situaciones, un solo teorema",
+            "revelar": ["suelo", "tronco", "rama", "h95", "volcan", "roca", "vRoca",
+                        "h525", "rugoso", "mu", "esquiadora", "vE", "colina",
+                        "ang25", "trineo", "vT"],
+            "math": [r"W_{\mathrm{neto}} = \Delta K"],
+            "text": ["El trabajo neto siempre es el cambio de energía cinética."],
+        },
+        {
+            "titulo": "a) La rama cae 95.0 m",
+            "math": [
+                r"v^2 = 2gh = 2(9.80)(95.0)",
+                r"v = 43.2\ \mathrm{m/s}",
+            ],
+            "resaltar": ["rama", "h95"],
+        },
+        {
+            "titulo": "b) La roca sube 525 m",
+            "math": [
+                r"v_0^2 = 2gh = 2(9.80)(525)",
+                r"v_0 = 101\ \mathrm{m/s}",
+            ],
+            "resaltar": ["roca", "h525"],
+        },
+        {
+            "titulo": "c) La esquiadora frena en lo áspero",
+            "math": [
+                r"d = \dfrac{v_0^2}{2\mu_k g} = \dfrac{(5.00)^2}{2(0.220)(9.80)}",
+                r"d = 5.80\ \mathrm{m}",
+            ],
+            "resaltar": ["esquiadora", "rugoso"],
+        },
+        {
+            "titulo": "d) Zona áspera de solo 2.90 m",
+            "math": [
+                r"v^2 = v_0^2 - 2\mu_k g d = 25.0 - 12.5",
+                r"v = 3.54\ \mathrm{m/s}",
+            ],
+        },
+        {
+            "titulo": "e) El trineo sube la colina lisa",
+            "math": [
+                r"h = \dfrac{v_0^2}{2g} = \dfrac{(12.0)^2}{2(9.80)} = 7.35\ \mathrm{m}",
+            ],
+            "resaltar": ["trineo", "colina"],
+        },
+    ]
+    resultado_latex = r"43.2\ \mathrm{m/s};\ 101\ \mathrm{m/s};\ 5.80\ \mathrm{m};\ 3.54\ \mathrm{m/s};\ 7.35\ \mathrm{m}"
+
+
+class P6_20(Cap6Scene):
+    numero = "6.20"
+    titulo = "Piedra lanzada hacia arriba"
+    lista_datos = [
+        ("Peso de la piedra:", r"w = 20\ \mathrm{N}"),
+        ("Altura de referencia:", r"15.0\ \mathrm{m}"),
+        ("Rapidez a 15 m:", r"25.0\ \mathrm{m/s}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "suelo", p(-2.6, -1.8), p(1.6, -1.8), color=self.MUTED, grosor=4)
+        self.f_cuerpo(fig, "piedra", p(0.0, -1.8), forma="punto", color=self.WHITE)
+        self.f_vector(fig, "v0", p(0.0, -1.8), UP, 1.2, color=self.CYAN,
+                      etiqueta=r"v_0", lado=RIGHT, etiqueta_size=24)
+        self.f_linea(fig, "h15", p(0.9, -1.8), p(0.9, -0.2),
+                     color=self.GREEN, grosor=2, discontinuo=True,
+                     etiqueta=r"15", lado=RIGHT, etiqueta_size=20)
+        self.f_texto(fig, "v15", r"v = 25", (0.9, 0.15, 0), size=22,
+                     color=self.CYAN, math=True)
+        self.f_linea(fig, "hmax", p(-0.9, -1.8), p(-0.9, 1.3),
+                     color=self.YELLOW, grosor=2, discontinuo=True,
+                     etiqueta=r"H", lado=LEFT, etiqueta_size=24)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "La piedra sube frenada por su peso",
+            "revelar": ["suelo", "piedra", "v0", "h15", "v15", "hmax"],
+            "text": ["Sin aire: el peso hace todo el trabajo negativo."],
+        },
+        {
+            "titulo": "Rapidez de lanzamiento",
+            "math": [
+                r"-w(15.0) = \tfrac12 mv^2 - \tfrac12 mv_0^2",
+                r"v_0 = \sqrt{25.0^2 + 2(9.80)(15.0)} = 30.3\ \mathrm{m/s}",
+            ],
+            "resaltar": ["v0", "v15"],
+        },
+        {
+            "titulo": "Altura máxima",
+            "math": [
+                r"H = \dfrac{v_0^2}{2g} = \dfrac{(30.3)^2}{2(9.80)} = 46.9\ \mathrm{m}",
+            ],
+            "resaltar": ["hmax"],
+        },
+    ]
+    resultado_latex = r"v_0 = 30.3\ \mathrm{m/s}, \qquad H = 46.9\ \mathrm{m}"
+
+
+class P6_21(Cap6Scene):
+    numero = "6.21"
+    titulo = "Caja de rescate ladera arriba"
+    lista_datos = [
+        ("Ángulo de la pendiente:", r"\alpha"),
+        ("Desnivel hasta el esquiador:", r"h"),
+        ("Fricción cinética:", r"\mu_k"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        th = np.deg2rad(28.0)
+        u = np.array([np.cos(th), np.sin(th), 0.0])
+        n = np.array([-np.sin(th), np.cos(th), 0.0])
+        A = p(-3.1, -1.7)
+        B = A + 4.6 * u
+        self.f_linea(fig, "rampa", A, B, color=self.BLUE, grosor=6)
+        self.f_linea(fig, "base", p(A[0], A[1]), p(B[0], A[1]), color=self.MUTED, grosor=3)
+        self.f_angulo(fig, "alpha", A, A + u, A + RIGHT, radio=0.6,
+                      etiqueta=r"\alpha", etiqueta_size=22)
+        C = A + 0.9 * u + 0.35 * n
+        self.f_cuerpo(fig, "caja", C, ancho=0.95, alto=0.65,
+                      color=self.GREEN)
+        self.f_texto(fig, "etCaja", "caja", C + UP * 0.62, size=22, color=self.WHITE)
+        self.f_vector(fig, "v0", C, u, 1.1, color=self.CYAN,
+                      etiqueta=r"v_0", lado=UP, etiqueta_size=24)
+        self.f_vector(fig, "fk", C - 0.55 * u, -u, 0.8, color=self.YELLOW,
+                      etiqueta=r"f_k", lado=DOWN, etiqueta_size=22)
+        self.f_vector(fig, "N", C, n, 0.9, color=self.CYAN,
+                      etiqueta=r"N", lado=RIGHT, etiqueta_size=22)
+        self.f_vector(fig, "w", C, DOWN, 1.0, color=self.ORANGE,
+                      etiqueta=r"mg", lado=DOWN, etiqueta_size=22)
+        self.f_linea(fig, "h", p(1.4, A[1]), p(1.4, A[1] + 1.7),
+                     color=self.GREEN, grosor=2, discontinuo=True,
+                     etiqueta=r"h", lado=RIGHT, etiqueta_size=24)
+        self.f_cuerpo(fig, "esquiador", p(1.05, A[1] + 1.7), forma="punto",
+                      color=self.RED)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Geometría: distancia sobre la pendiente",
+            "revelar": ["rampa", "base", "alpha", "caja", "etCaja", "esquiador", "h"],
+            "math": [r"d = \dfrac{h}{\sin\alpha}"],
+        },
+        {
+            "titulo": "Trabajos del peso y la fricción",
+            "revelar": ["v0", "fk", "N", "w"],
+            "math": [
+                r"W_g = -mgh",
+                r"W_f = -\mu_k mg\cos\alpha\cdot d = -\mu_k mgh\cot\alpha",
+            ],
+            "resaltar": ["fk", "w"],
+        },
+        {
+            "titulo": "Rapidez mínima en la base",
+            "math": [
+                r"\tfrac12 mv_0^2 + W_g + W_f = 0",
+                r"v_0 = \sqrt{2gh\,(1 + \mu_k\cot\alpha)}",
+            ],
+            "text": ["Justo la necesaria para llegar arriba con rapidez cero."],
+        },
+    ]
+    resultado_latex = r"v_0 = \sqrt{2gh\,(1 + \mu_k\cot\alpha)}"
