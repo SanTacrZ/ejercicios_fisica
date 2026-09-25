@@ -10,9 +10,9 @@ Render del lote:
 
 LOTE 1 (orden de la lista): 6.1, 6.4, 6.5, 6.6, 6.8
 LOTE 2 (orden de la lista): 6.12, 6.14, 6.19, 6.20, 6.21
+LOTE 3 (orden de la lista): 6.33, 6.34, 6.35, 6.37, 6.43
 PENDIENTES cap6:
-    33, 34, 35, 37, 43, 45, 46, 52, 56,
-    60, 61, 65, 66, 69, 71, 72, 75, 76, 80, 81, 84, 85, 87, 94, 97
+    45, 46, 52, 56, 60, 61, 65, 66, 69, 71, 72, 75, 76, 80, 81, 84, 85, 87, 94, 97
 """
 
 import numpy as np
@@ -23,6 +23,22 @@ from fisica_base import ProblemaScene, Figura
 
 def p(x, y):
     return np.array([x, y, 0.0])
+
+
+def resorte(p0, p1, vueltas=7, amp=0.13, color="#F4F7FB", grosor=4):
+    """Zigzag de resorte entre dos puntos (para registrar en una Figura)."""
+    a = np.array(p0, dtype=float)
+    b = np.array(p1, dtype=float)
+    d = b - a
+    u = d / (np.linalg.norm(d) + 1e-9)
+    n = np.array([-u[1], u[0], 0.0])
+    pts = [a]
+    N = 2 * vueltas
+    for i in range(1, N):
+        t = i / N
+        pts.append(a + d * t + n * (amp if i % 2 == 1 else -amp))
+    pts.append(b)
+    return VMobject().set_points_as_corners(pts).set_color(color).set_stroke(width=grosor)
 
 
 class Cap6Scene(ProblemaScene):
@@ -654,3 +670,264 @@ class P6_21(Cap6Scene):
         },
     ]
     resultado_latex = r"v_0 = \sqrt{2gh\,(1 + \mu_k\cot\alpha)}"
+
+
+class P6_33(Cap6Scene):
+    numero = "6.33"
+    titulo = "Tres masas colgadas de tres resortes en serie"
+    lista_datos = [
+        ("Masa de cada bloque:", r"m = 6.40\ \mathrm{kg}"),
+        ("Constante de cada resorte:", r"k = 7.80\ \mathrm{kN/m}"),
+        ("Longitud natural:", r"L_0 = 12.0\ \mathrm{cm}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "soporte", p(-1.2, 2.3), p(1.2, 2.3), color=self.MUTED, grosor=3)
+        fig.registrar("res1", resorte(p(0, 2.3), p(0, 1.55)), lambda m: Create(m))
+        fig.registrar("res2", resorte(p(0, 0.925), p(0, 0.175)), lambda m: Create(m))
+        fig.registrar("res3", resorte(p(0, -0.375), p(0, -1.125)), lambda m: Create(m))
+        self.f_cuerpo(fig, "m1", p(0, 1.2), ancho=0.85, alto=0.55,
+                      color=self.BLUE, etiqueta=r"m")
+        self.f_cuerpo(fig, "m2", p(0, -0.1), ancho=0.85, alto=0.55,
+                      color=self.GREEN, etiqueta=r"m")
+        self.f_cuerpo(fig, "m3", p(0, -1.4), ancho=0.85, alto=0.55,
+                      color=self.ORANGE, etiqueta=r"m")
+        self.f_vector(fig, "F1", p(-0.32, 1.2), UP, 1.2, color=self.CYAN,
+                      etiqueta=r"F_1", lado=LEFT, etiqueta_size=22)
+        self.f_vector(fig, "F2", p(-0.32, -0.1), UP, 0.85, color=self.CYAN,
+                      etiqueta=r"F_2", lado=LEFT, etiqueta_size=22)
+        self.f_vector(fig, "F3", p(-0.32, -1.4), UP, 0.6, color=self.CYAN,
+                      etiqueta=r"F_3", lado=LEFT, etiqueta_size=22)
+        self.f_vector(fig, "w1", p(0.32, 1.2), DOWN, 0.7, color=self.ORANGE,
+                      etiqueta=r"mg", lado=RIGHT, etiqueta_size=20)
+        self.f_vector(fig, "w2", p(0.32, -0.1), DOWN, 0.7, color=self.ORANGE,
+                      etiqueta=r"mg", lado=RIGHT, etiqueta_size=20)
+        self.f_vector(fig, "w3", p(0.32, -1.4), DOWN, 0.7, color=self.ORANGE,
+                      etiqueta=r"mg", lado=RIGHT, etiqueta_size=20)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Tres resortes en serie con tres masas",
+            "revelar": ["soporte", "res1", "res2", "res3", "m1", "m2", "m3"],
+            "text": ["Cada resorte carga las masas que cuelgan debajo de él."],
+        },
+        {
+            "titulo": "Diagrama de cuerpo libre de cada masa",
+            "revelar": ["F1", "F2", "F3", "w1", "w2", "w3"],
+            "math": [
+                r"F_3 = mg, \qquad F_2 = 2mg, \qquad F_1 = 3mg",
+            ],
+            "text": ["El resorte superior es el más exigido: sostiene a las tres."],
+            "resaltar": ["F1", "F2", "F3"],
+        },
+        {
+            "titulo": "Estiramiento y longitud de cada resorte",
+            "math": [
+                r"x = \dfrac{F}{k} = \dfrac{mg}{k} = 0.804\ \mathrm{cm}\ \text{(por masa)}",
+                r"L_3 = 12.8\ \mathrm{cm}, \quad L_2 = 13.6\ \mathrm{cm}, \quad L_1 = 14.4\ \mathrm{cm}",
+            ],
+        },
+    ]
+    resultado_latex = r"L_1 = 14.4\ \mathrm{cm}, \quad L_2 = 13.6\ \mathrm{cm}, \quad L_3 = 12.8\ \mathrm{cm}"
+
+
+class P6_34(Cap6Scene):
+    numero = "6.34"
+    titulo = "Trabajo de una fuerza variable (gráfica)"
+    lista_datos = [
+        ("Masa del trineo:", r"m = 10.0\ \mathrm{kg}"),
+        ("Fuerza máxima:", r"F_{\max} = 10.0\ \mathrm{N}\ \text{en }x = 8.0\ \mathrm{m}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        f = lambda x: np.where(x <= 8.0, 10.0 * x / 8.0, 10.0 * (12.0 - x) / 4.0)
+        axes = self.f_grafica(
+            fig, "grafica", [f],
+            x_range=[0, 12, 2], y_range=[0, 10, 2],
+            x_label="x\\,(\\mathrm{m})", y_label="F_x\\,(\\mathrm{N})",
+            ancho=4.4, alto=3.0, centro=(0.0, -0.2),
+        )
+        plot = fig.mob("grafica_c0")
+        a1 = axes.get_area(plot, x_range=[0, 8.0], color=self.GREEN, opacity=0.3)
+        fig.registrar("area1", a1, lambda m: FadeIn(m))
+        a2 = axes.get_area(plot, x_range=[8.0, 12.0], color=self.YELLOW, opacity=0.3)
+        fig.registrar("area2", a2, lambda m: FadeIn(m))
+        return fig
+
+    pasos = [
+        {
+            "titulo": "La fuerza varía con la posición",
+            "revelar": ["grafica_ejes", "grafica_c0"],
+            "text": ["El trabajo es el área bajo la curva, aunque la fuerza cambie."],
+        },
+        {
+            "titulo": "De x = 0 a x = 8.0 m",
+            "revelar": ["area1"],
+            "math": [r"W = \tfrac12(8.0)(10.0) = 40.0\ \mathrm{J}"],
+            "resaltar": ["area1"],
+        },
+        {
+            "titulo": "De x = 8.0 a x = 12.0 m",
+            "revelar": ["area2"],
+            "math": [r"W = \tfrac12(4.0)(10.0) = 20.0\ \mathrm{J}"],
+            "resaltar": ["area2"],
+        },
+        {
+            "titulo": "De x = 0 a x = 12.0 m",
+            "math": [r"W = 40.0 + 20.0 = 60.0\ \mathrm{J}"],
+        },
+    ]
+    resultado_latex = r"W_{0\to8} = 40.0\ \mathrm{J}, \quad W_{8\to12} = 20.0\ \mathrm{J}, \quad W_{0\to12} = 60.0\ \mathrm{J}"
+
+
+class P6_35(Cap6Scene):
+    numero = "6.35"
+    titulo = "Rapidez con fuerza variable"
+    lista_datos = [
+        ("Masa del trineo:", r"m = 10.0\ \mathrm{kg}"),
+        ("Parte del reposo en:", r"x = 0"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        f = lambda x: np.where(x <= 8.0, 10.0 * x / 8.0, 10.0 * (12.0 - x) / 4.0)
+        axes = self.f_grafica(
+            fig, "grafica", [f],
+            x_range=[0, 12, 2], y_range=[0, 10, 2],
+            x_label="x\\,(\\mathrm{m})", y_label="F_x\\,(\\mathrm{N})",
+            ancho=4.4, alto=3.0, centro=(0.0, -0.2),
+        )
+        plot = fig.mob("grafica_c0")
+        a1 = axes.get_area(plot, x_range=[0, 8.0], color=self.GREEN, opacity=0.3)
+        fig.registrar("area1", a1, lambda m: FadeIn(m))
+        a2 = axes.get_area(plot, x_range=[8.0, 12.0], color=self.YELLOW, opacity=0.3)
+        fig.registrar("area2", a2, lambda m: FadeIn(m))
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El área da la energía cinética",
+            "revelar": ["grafica_ejes", "grafica_c0"],
+            "math": [r"\tfrac12 mv^2 = W = \text{área}"],
+            "text": ["Sin fricción, todo el trabajo se vuelve rapidez."],
+        },
+        {
+            "titulo": "Rapidez en x = 8.0 m",
+            "revelar": ["area1"],
+            "math": [
+                r"W = 40.0\ \mathrm{J}",
+                r"v = \sqrt{\dfrac{2W}{m}} = \sqrt{\dfrac{80.0}{10.0}} = 2.83\ \mathrm{m/s}",
+            ],
+            "resaltar": ["area1"],
+        },
+        {
+            "titulo": "Rapidez en x = 12.0 m",
+            "revelar": ["area2"],
+            "math": [
+                r"W = 60.0\ \mathrm{J}",
+                r"v = \sqrt{\dfrac{120}{10.0}} = 3.46\ \mathrm{m/s}",
+            ],
+            "resaltar": ["area2"],
+        },
+    ]
+    resultado_latex = r"v(8.0) = 2.83\ \mathrm{m/s}, \qquad v(12.0) = 3.46\ \mathrm{m/s}"
+
+
+class P6_37(Cap6Scene):
+    numero = "6.37"
+    titulo = "Caja que comprime un resorte"
+    lista_datos = [
+        ("Masa de la caja:", r"m = 6.0\ \mathrm{kg}"),
+        ("Rapidez inicial:", r"v_0 = 3.0\ \mathrm{m/s}"),
+        ("Constante del resorte:", r"k = 75\ \mathrm{N/cm}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "piso", p(-3.2, -0.4), p(2.6, -0.4), color=self.MUTED, grosor=4)
+        self.f_linea(fig, "pared", p(-2.9, -0.4), p(-2.9, 1.6), color=self.MUTED, grosor=4)
+        fig.registrar("resorte", resorte(p(-2.9, 0.35), p(-0.9, 0.35)),
+                       lambda m: Create(m))
+        self.f_cuerpo(fig, "caja", p(0.35, 0.0), ancho=1.2, alto=0.8,
+                      color=self.BLUE, etiqueta="caja")
+        self.f_vector(fig, "v", p(-0.25, 0.0), LEFT, 1.2, color=self.CYAN,
+                      etiqueta=r"v_0", lado=UP, etiqueta_size=24)
+        self.f_linea(fig, "xmax", p(-0.9, -0.4), p(-0.9, -1.1),
+                     color=self.YELLOW, grosor=2, discontinuo=True,
+                     etiqueta=r"x_{\max}", lado=DOWN, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "La caja se estrella contra el resorte",
+            "revelar": ["piso", "pared", "resorte", "caja", "v"],
+            "text": ["Sin fricción: la energía cinética se guarda en el resorte."],
+        },
+        {
+            "titulo": "Toda la energía pasa al resorte",
+            "revelar": ["xmax"],
+            "math": [
+                r"\tfrac12 mv_0^2 = \tfrac12 kx_{\max}^2",
+                r"x_{\max} = v_0\sqrt{\dfrac{m}{k}} = 3.0\sqrt{\dfrac{6.0}{7500}}",
+                r"x_{\max} = 8.49\times10^{-2}\ \mathrm{m} = 8.49\ \mathrm{cm}",
+            ],
+            "resaltar": ["xmax"],
+        },
+    ]
+    resultado_latex = r"x_{\max} = 8.49\ \mathrm{cm}"
+
+
+class P6_43(Cap6Scene):
+    numero = "6.43"
+    titulo = "Trineo impulsado por un resorte gigante"
+    lista_datos = [
+        ("Constante del resorte:", r"k = 40.0\ \mathrm{N/cm}"),
+        ("Masa total:", r"m = 70.0\ \mathrm{kg}"),
+        ("Compresión inicial:", r"x_0 = 0.375\ \mathrm{m}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "piso", p(-3.4, -0.5), p(3.2, -0.5), color=self.MUTED, grosor=4)
+        self.f_linea(fig, "pared", p(-3.1, -0.5), p(-3.1, 1.7), color=self.MUTED, grosor=4)
+        fig.registrar("resorte", resorte(p(-3.1, 0.3), p(-1.5, 0.3), vueltas=9),
+                       lambda m: Create(m))
+        self.f_cuerpo(fig, "trineo", p(-0.75, -0.05), ancho=1.4, alto=0.8,
+                      color=self.BLUE, etiqueta="trineo")
+        flecha = DoubleArrow(p(-3.1, -1.0), p(-1.5, -1.0), color=self.YELLOW,
+                             stroke_width=3, tip_length=0.15)
+        fig.registrar("comp", flecha, lambda m: Create(m))
+        self.f_texto(fig, "etComp", r"0.375\ \mathrm{m}", (-2.3, -1.35, 0), size=24,
+                     color=self.YELLOW, math=True)
+        self.f_vector(fig, "v", p(-0.05, -0.05), RIGHT, 1.2, color=self.CYAN,
+                      etiqueta=r"v", lado=UP, etiqueta_size=26)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El resorte comprimido empuja al trineo",
+            "revelar": ["piso", "pared", "resorte", "trineo", "comp", "etComp"],
+            "text": ["Sin fricción: la energía elástica se vuelve cinética."],
+        },
+        {
+            "titulo": "a) Rapidez al llegar a longitud natural",
+            "revelar": ["v"],
+            "math": [
+                r"\tfrac12 kx_0^2 = \tfrac12 mv^2",
+                r"v = x_0\sqrt{\dfrac{k}{m}} = 0.375\sqrt{\dfrac{4000}{70.0}}",
+                r"v = 2.83\ \mathrm{m/s}",
+            ],
+            "resaltar": ["v", "resorte"],
+        },
+        {
+            "titulo": "b) Aún comprimido 0.200 m",
+            "math": [
+                r"\tfrac12 k(x_0^2 - x^2) = \tfrac12 mv^2",
+                r"v = \sqrt{\dfrac{4000(0.375^2 - 0.200^2)}{70.0}} = 2.40\ \mathrm{m/s}",
+            ],
+        },
+    ]
+    resultado_latex = r"v_a = 2.83\ \mathrm{m/s}, \qquad v_b = 2.40\ \mathrm{m/s}"
