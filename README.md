@@ -11,6 +11,7 @@ descomposición de vectores y, de ahí, las ecuaciones.
   y escenas demo (`DemoRampa`, `DemoGrafica`).
 - `cap5_visual.py` — Capítulo 5, edición visual paso a paso.
 - `cap6_visual.py` — Capítulo 6 (trabajo y energía), edición visual paso a paso.
+- `cap7_visual.py` — Capítulo 7 (energía potencial y conservación), edición visual.
 - `cap5_leyes_newton.py` — Capítulo 5, edición solo ecuaciones (legado).
 - `torque_animation.py` — clase visual de torque.
 
