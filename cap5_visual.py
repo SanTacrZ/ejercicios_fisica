@@ -16,8 +16,9 @@ LOTE 3 (orden de la lista): 5.27, 5.31, 5.33, 5.34, 5.42
 LOTE 4 (orden de la lista): 5.44, 5.45, 5.46, 5.47, 5.51
 LOTE 5 (orden de la lista): 5.56, 5.57, 5.58, 5.59, 5.60
 LOTE 6 (orden de la lista): 5.65, 5.66, 5.68, 5.72, 5.74
+LOTE 7 (orden de la lista): 5.77, 5.80, 5.84, 5.85, 5.87
 PENDIENTES cap5:
-    77, 80, 84, 85, 87, 92, 100, 101, 103, 110, 112, 119, 127
+    92, 100, 101, 103, 110, 112, 119, 127
 """
 
 import numpy as np
@@ -1575,7 +1576,296 @@ class P5_66(ProblemaScene):
             ],
         },
     ]
-    resultado_latex = r"F = 121\ \mathrm{N}"
+    resultado_latex = r"F = 31.2\ \mathrm{N}, \qquad N = 25.0\ \mathrm{N}"
+
+
+class P5_77(ProblemaScene):
+    numero = "5.77"
+    titulo = "Báscula en un elevador que acelera"
+    subtitulo = "Segunda ley de Newton · peso aparente"
+    lista_datos = [
+        ("Masa de la persona:", r"m = 64\ \mathrm{kg}"),
+        ("Rapidez del elevador:", r"v(t) = (3.0)t + (0.20)t^2"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "muroI", p(-1.9, -2.2), p(-1.9, 2.2), color=self.MUTED, grosor=3)
+        self.f_linea(fig, "muroD", p(1.9, -2.2), p(1.9, 2.2), color=self.MUTED, grosor=3)
+        self.f_cuerpo(fig, "cabina", p(0.0, -0.3), ancho=2.2, alto=1.9,
+                      color=self.BLUE)
+        self.f_texto(fig, "etCab", "elevador", p(0.0, 0.35), size=24, color=self.WHITE)
+        self.f_cuerpo(fig, "persona", p(0.0, -0.7), forma="punto", color=self.WHITE)
+        self.f_vector(fig, "N", p(0.0, -0.7), UP, 1.0, color=self.CYAN,
+                      etiqueta=r"N", lado=RIGHT, etiqueta_size=24)
+        self.f_vector(fig, "w", p(0.0, -0.7), DOWN, 0.7, color=self.ORANGE,
+                      etiqueta=r"mg", lado=RIGHT, etiqueta_size=22)
+        self.f_vector(fig, "a", p(1.55, -0.3), UP, 0.9, color=self.RED,
+                      etiqueta=r"a", lado=RIGHT, etiqueta_size=24)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "La persona viaja dentro del elevador",
+            "revelar": ["muroI", "muroD", "cabina", "etCab", "persona"],
+            "text": ["La báscula mide la normal N, no el peso mg."],
+        },
+        {
+            "titulo": "Aceleración en t = 4.0 s",
+            "revelar": ["a"],
+            "math": [r"a = \dfrac{dv}{dt} = 3.0 + 0.40t = 4.6\ \mathrm{m/s^2}"],
+            "resaltar": ["a"],
+        },
+        {
+            "titulo": "Lectura de la báscula",
+            "revelar": ["N", "w"],
+            "math": [r"N = m(g+a) = 64(9.80+4.6) = 9.2\times10^2\ \mathrm{N}"],
+            "text": ["El elevador sube acelerando: la persona pesa más."],
+            "resaltar": ["N"],
+        },
+    ]
+    resultado_latex = r"N = 9.2\times10^2\ \mathrm{N}"
+
+
+class P5_80(ProblemaScene):
+    numero = "5.80"
+    titulo = "Martillo colgante en un autobús que acelera"
+    subtitulo = "Segunda ley de Newton · marco acelerado"
+    lista_datos = [
+        ("Ángulo con el techo:", r"67^\circ"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "techo", p(-3.0, 1.9), p(3.0, 1.9), color=self.MUTED, grosor=4)
+        O = p(0.0, 1.9)
+        phi = np.deg2rad(23.0)
+        cuerda_dir = np.array([-np.sin(phi), -np.cos(phi), 0.0])
+        M = O + 2.1 * cuerda_dir
+        self.f_linea(fig, "cuerda", O, M, color=self.WHITE, grosor=5)
+        self.f_cuerpo(fig, "martillo", M, ancho=0.65, alto=0.55,
+                      color=self.ORANGE, etiqueta="m")
+        self.f_angulo(fig, "ang67", O, O + LEFT, M, radio=0.7,
+                      etiqueta=r"67^\circ", etiqueta_size=22)
+        self.f_angulo(fig, "angPhi", O, O + DOWN, M, radio=0.95,
+                      etiqueta=r"\phi", etiqueta_size=24)
+        self.f_vector(fig, "T", M, O - M, 1.05, color=self.CYAN,
+                      etiqueta=r"T", lado=RIGHT, etiqueta_size=24)
+        self.f_vector(fig, "w", M, DOWN, 0.85, color=self.ORANGE,
+                      etiqueta=r"mg", lado=LEFT, etiqueta_size=22)
+        self.f_vector(fig, "a", p(1.5, 0.2), RIGHT, 1.0, color=self.RED,
+                      etiqueta=r"a", lado=UP, etiqueta_size=24)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El martillo cuelga inclinado hacia atrás",
+            "revelar": ["techo", "cuerda", "martillo", "ang67"],
+            "text": ["El autobús acelera hacia adelante y la cuerda se inclina."],
+        },
+        {
+            "titulo": "Ángulo con la vertical",
+            "revelar": ["angPhi"],
+            "math": [r"\phi = 90^\circ - 67^\circ = 23^\circ"],
+            "resaltar": ["angPhi"],
+        },
+        {
+            "titulo": "Aceleración del autobús",
+            "revelar": ["T", "w", "a"],
+            "math": [
+                r"T\sin\phi = ma, \qquad T\cos\phi = mg",
+                r"a = g\tan\phi = (9.80)\tan 23^\circ = 4.16\ \mathrm{m/s^2}",
+            ],
+            "resaltar": ["T", "a"],
+        },
+    ]
+    resultado_latex = r"a = 4.16\ \mathrm{m/s^2}"
+
+
+class P5_84(ProblemaScene):
+    numero = "5.84"
+    titulo = "Fracción de cuerda que puede colgar de una mesa"
+    subtitulo = "Primera ley de Newton · fricción estática límite"
+    lista_datos = [
+        ("Coef. de fricción estática:", r"\mu_s"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "mesa", p(-3.2, 0.2), p(0.5, 0.2), color=self.MUTED, grosor=4)
+        self.f_linea(fig, "pata", p(-2.9, 0.2), p(-2.9, -1.9), color=self.MUTED, grosor=3)
+        self.f_linea(fig, "cuerdaM", p(-2.6, 0.32), p(0.5, 0.32), color=self.WHITE, grosor=5)
+        self.f_linea(fig, "cuerdaC", p(0.5, 0.2), p(0.5, -1.4), color=self.WHITE, grosor=5)
+        self.f_texto(fig, "etMesa", r"(1-x)w", (-1.1, 0.95, 0), size=26,
+                     color=self.CYAN, math=True)
+        self.f_texto(fig, "etCuelga", r"xw", (1.05, -0.6, 0), size=26,
+                     color=self.ORANGE, math=True)
+        self.f_vector(fig, "fk", p(-1.3, 0.32), LEFT, 0.9, color=self.YELLOW,
+                      etiqueta=r"f_s", lado=UP, etiqueta_size=24)
+        self.f_vector(fig, "wC", p(0.5, -1.0), DOWN, 0.75, color=self.ORANGE,
+                      etiqueta=r"xw", lado=RIGHT, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Parte sobre la mesa y parte colgando",
+            "revelar": ["mesa", "pata", "cuerdaM", "cuerdaC", "etMesa", "etCuelga"],
+            "text": ["x es la fracción de cuerda que cuelga del borde."],
+        },
+        {
+            "titulo": "Equilibrio en el borde",
+            "revelar": ["fk", "wC"],
+            "math": [r"xw = f_s = \mu_s(1-x)w"],
+            "text": ["Lo que cuelga tira; la fricción sobre la mesa lo sostiene."],
+            "resaltar": ["fk", "wC"],
+        },
+        {
+            "titulo": "Despejando la fracción",
+            "math": [r"x(1+\mu_s) = \mu_s \;\Rightarrow\; x = \dfrac{\mu_s}{1+\mu_s}"],
+        },
+    ]
+    resultado_latex = r"x = \dfrac{\mu_s}{1+\mu_s}"
+
+
+class P5_85(ProblemaScene):
+    numero = "5.85"
+    titulo = "Caja sobre la plataforma de una camioneta"
+    subtitulo = "Segunda ley de Newton · fricción que acelera"
+    lista_datos = [
+        ("Masa de la caja:", r"m = 40.0\ \mathrm{kg}"),
+        ("Fricción estática:", r"\mu_s = 0.30"),
+        ("Fricción cinética:", r"\mu_k = 0.20"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "plataforma", p(-3.3, -0.6), p(3.3, -0.6), color=self.MUTED, grosor=4)
+        self.f_cuerpo(fig, "caja", p(-0.2, -0.15), ancho=1.3, alto=0.8,
+                      color=self.BLUE)
+        self.f_texto(fig, "etCaja", "caja", p(-0.2, 0.55), size=22, color=self.WHITE)
+        self.f_vector(fig, "accA", p(-0.2, -1.15), RIGHT, 0.95, color=self.CYAN,
+                      etiqueta=r"a_N", lado=DOWN, etiqueta_size=22)
+        self.f_vector(fig, "fA", p(0.45, -0.15), RIGHT, 0.9, color=self.YELLOW,
+                      etiqueta=r"f = 88", lado=UP, etiqueta_size=22)
+        self.f_vector(fig, "accB", p(-0.2, -1.15), LEFT, 0.95, color=self.CYAN,
+                      etiqueta=r"a_S", lado=DOWN, etiqueta_size=22)
+        self.f_vector(fig, "fB", p(-0.85, -0.15), LEFT, 0.85, color=self.YELLOW,
+                      etiqueta=r"f_k", lado=UP, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "La caja viaja sobre la camioneta",
+            "revelar": ["plataforma", "caja", "etCaja"],
+            "text": ["Solo la fricción puede acelerar a la caja con la camioneta."],
+        },
+        {
+            "titulo": "a) Aceleración de 2.20 m/s² al norte",
+            "revelar": ["accA", "fA"],
+            "math": [
+                r"f_{\mathrm{req}} = ma = (40.0)(2.20) = 88.0\ \mathrm{N}",
+                r"f_{s,\max} = \mu_s mg = 0.30(40.0)(9.80) = 118\ \mathrm{N}",
+            ],
+            "text": ["Como 88.0 < 118, no desliza: f = 88.0 N al norte."],
+            "resaltar": ["fA"],
+        },
+        {
+            "titulo": "b) Aceleración de 3.40 m/s² al sur",
+            "ocultar": ["accA", "fA"],
+            "revelar": ["accB", "fB"],
+            "math": [r"f_{\mathrm{req}} = (40.0)(3.40) = 136\ \mathrm{N} > 118\ \mathrm{N}"],
+            "text": ["La caja desliza: la fricción pasa a ser cinética."],
+            "resaltar": ["fB"],
+        },
+        {
+            "titulo": "Fricción cinética",
+            "math": [r"f_k = \mu_k mg = 0.20(40.0)(9.80) = 78.4\ \mathrm{N}"],
+            "text": ["Al sur, opuesta al deslizamiento de la caja."],
+        },
+    ]
+    resultado_latex = r"a)\ 88.0\ \mathrm{N}\ \text{al norte}; \qquad b)\ 78.4\ \mathrm{N}\ \text{al sur}"
+
+
+class P5_87(ProblemaScene):
+    numero = "5.87"
+    titulo = "Dos esferas idénticas que se tocan"
+    subtitulo = "Primera ley de Newton · suspensión en V"
+    lista_datos = [
+        ("Masa de cada esfera:", r"m = 15.0\ \mathrm{kg}"),
+        ("Diámetro:", r"d = 25.0\ \mathrm{cm}"),
+        ("Alambres laterales:", r"35.0\ \mathrm{cm}"),
+        ("Cable único:", r"18.0\ \mathrm{cm}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "techo", p(-2.2, 2.0), p(2.2, 2.0), color=self.MUTED, grosor=3)
+        J = p(0.0, 1.1)
+        self.f_linea(fig, "cable", p(0.0, 2.0), J, color=self.WHITE, grosor=5)
+        self.f_cuerpo(fig, "nudo", J, forma="punto", color=self.WHITE)
+        cI = p(-0.625, -0.5346)
+        cD = p(0.625, -0.5346)
+        self.f_linea(fig, "alambreI", J, cI, color=self.WHITE, grosor=4)
+        self.f_linea(fig, "alambreD", J, cD, color=self.WHITE, grosor=4)
+        esfI = Circle(radius=0.625, color=self.BLUE, stroke_width=7).move_to(cI)
+        fig.registrar("esfI", esfI, lambda m: Create(m))
+        esfD = Circle(radius=0.625, color=self.GREEN, stroke_width=7).move_to(cD)
+        fig.registrar("esfD", esfD, lambda m: Create(m))
+        self.f_angulo(fig, "phiI", J, J + DOWN, cI, radio=0.45,
+                      etiqueta=r"\phi", etiqueta_size=22)
+        self.f_angulo(fig, "phiD", J, J + DOWN, cD, radio=0.45,
+                      etiqueta=r"\phi", etiqueta_size=22)
+        self.f_vector(fig, "T1", cI, J - cI, 0.85, color=self.CYAN,
+                      etiqueta=r"T", lado=LEFT, etiqueta_size=24)
+        self.f_vector(fig, "T2", cD, J - cD, 0.85, color=self.CYAN,
+                      etiqueta=r"T", lado=RIGHT, etiqueta_size=24)
+        self.f_vector(fig, "w1", cI, DOWN, 0.9, color=self.ORANGE,
+                      etiqueta=r"mg", lado=LEFT, etiqueta_size=20)
+        self.f_vector(fig, "w2", cD, DOWN, 0.9, color=self.ORANGE,
+                      etiqueta=r"mg", lado=RIGHT, etiqueta_size=20)
+        self.f_vector(fig, "Tc", J, UP, 0.8, color=self.GREEN,
+                      etiqueta=r"T_c", lado=RIGHT, etiqueta_size=22)
+        self.f_vector(fig, "N1", cI + UP * 0.1, LEFT, 0.7, color=self.YELLOW,
+                      etiqueta=r"N", lado=UP, etiqueta_size=22)
+        self.f_vector(fig, "N2", cD + UP * 0.1, RIGHT, 0.7, color=self.YELLOW,
+                      etiqueta=r"N", lado=UP, etiqueta_size=22)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Dos esferas colgadas que se tocan",
+            "revelar": ["techo", "cable", "nudo", "alambreI", "alambreD",
+                        "esfI", "esfD", "phiI", "phiD"],
+            "text": ["Los centros quedan a un diámetro: cada alambre se inclina."],
+        },
+        {
+            "titulo": "Geometría: ángulo de cada alambre",
+            "math": [r"\sin\phi = \dfrac{12.5}{35.0} = 0.357 \;\Rightarrow\; \phi = 20.9^\circ"],
+            "resaltar": ["phiI", "phiD"],
+        },
+        {
+            "titulo": "Tensión en cada alambre lateral",
+            "revelar": ["T1", "T2", "w1", "w2"],
+            "math": [
+                r"T = \dfrac{mg}{\cos\phi} = \dfrac{(15.0)(9.80)}{\cos 20.9^\circ}",
+                r"T = 157\ \mathrm{N}",
+            ],
+            "resaltar": ["T1", "T2"],
+        },
+        {
+            "titulo": "Tensión en el cable único",
+            "revelar": ["Tc"],
+            "math": [r"T_{\mathrm{cable}} = 2mg = 2(15.0)(9.80) = 294\ \mathrm{N}"],
+            "resaltar": ["Tc"],
+        },
+        {
+            "titulo": "Empuje entre las esferas",
+            "revelar": ["N1", "N2"],
+            "math": [r"N = T\sin\phi = 157(0.357) = 56.2\ \mathrm{N}"],
+            "resaltar": ["N1", "N2"],
+        },
+    ]
+    resultado_latex = r"T = 157\ \mathrm{N}, \quad T_{\mathrm{cable}} = 294\ \mathrm{N}, \quad N = 56.2\ \mathrm{N}"
 
 
 class P5_68(ProblemaScene):
