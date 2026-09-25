@@ -11,9 +11,9 @@ Render del lote:
 
 LOTE 1 (orden de la lista): 7.1, 7.3, 7.5, 7.6, 7.9
 LOTE 2 (orden de la lista): 7.11, 7.13, 7.15, 7.16, 7.17
+LOTE 3 (orden de la lista): 7.19, 7.23, 7.30, 7.34, 7.36
 PENDIENTES cap7:
-    19, 23, 30, 34, 36, 37, 41, 42, 43,
-    45, 46, 49, 53, 55, 56, 57, 59, 63, 64, 66, 67, 68, 70, 73, 77, 87
+    37, 41, 42, 43, 45, 46, 49, 53, 55, 56, 57, 59, 63, 64, 66, 67, 68, 70, 73, 77, 87
 """
 
 import numpy as np
@@ -649,3 +649,293 @@ class P7_17(Cap7Scene):
         },
     ]
     resultado_latex = r"4U_0,\ U_0/4; \qquad x_0\sqrt2,\ x_0/\sqrt2"
+
+
+class P7_19(Cap7Scene):
+    numero = "7.19"
+    titulo = "Resorte que se comprime y libro que cae"
+    lista_datos = [
+        ("Constante del resorte:", r"k = 1600\ \mathrm{N/m}"),
+        ("Energía a almacenar:", r"U = 3.20\ \mathrm{J}"),
+        ("Libro que cae:", r"m = 1.20\ \mathrm{kg},\ h = 0.80\ \mathrm{m}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "suelo", p(-2.8, -1.8), p(2.6, -1.8), color=self.MUTED, grosor=4)
+
+        def zig(p0, p1, vueltas=8, amp=0.14):
+            a = np.array(p0, dtype=float)
+            b = np.array(p1, dtype=float)
+            d = b - a
+            u = d / (np.linalg.norm(d) + 1e-9)
+            nn = np.array([-u[1], u[0], 0.0])
+            pts = [a]
+            N = 2 * vueltas
+            for i in range(1, N):
+                pts.append(a + d * (i / N) + nn * (amp if i % 2 else -amp))
+            pts.append(b)
+            return VMobject().set_points_as_corners(pts).set_color("#F4F7FB").set_stroke(width=4)
+
+        fig.registrar("resorte", zig(p(0.0, -1.8), p(0.0, -0.9)), lambda m: Create(m))
+        self.f_cuerpo(fig, "libro", p(0.0, 0.35), ancho=1.0, alto=0.6,
+                      color=self.ORANGE, etiqueta="libro")
+        self.f_vector(fig, "v", p(0.0, 0.35), DOWN, 0.9, color=self.CYAN,
+                      etiqueta=r"v", lado=RIGHT, etiqueta_size=22)
+        self.f_linea(fig, "h", p(1.3, -1.8), p(1.3, 0.05),
+                     color=self.GREEN, grosor=2, discontinuo=True,
+                     etiqueta=r"0.80", lado=RIGHT, etiqueta_size=22)
+        self.f_linea(fig, "xmax", p(-1.1, -1.8), p(-1.1, -1.2),
+                     color=self.YELLOW, grosor=3,
+                     etiqueta=r"x", lado=LEFT, etiqueta_size=24)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Resorte vertical y libro que cae",
+            "revelar": ["suelo", "resorte", "libro", "v", "h"],
+            "text": ["El libro cae 0.80 m y además comprime al resorte."],
+        },
+        {
+            "titulo": "a) Compresión para 3.20 J",
+            "math": [
+                r"x = \sqrt{\dfrac{2U}{k}} = \sqrt{\dfrac{2(3.20)}{1600}}",
+                r"x = 6.32\times10^{-2}\ \mathrm{m} = 6.32\ \mathrm{cm}",
+            ],
+        },
+        {
+            "titulo": "b) El libro cae y comprime",
+            "revelar": ["xmax"],
+            "math": [
+                r"mg(h+x) = \tfrac12 kx^2",
+                r"800x^2 - 11.76x - 9.41 = 0",
+                r"x = 0.116\ \mathrm{m} = 11.6\ \mathrm{cm}",
+            ],
+            "resaltar": ["xmax"],
+        },
+    ]
+    resultado_latex = r"x_a = 6.32\ \mathrm{cm}, \qquad x_b = 11.6\ \mathrm{cm}"
+
+
+class P7_23(Cap7Scene):
+    numero = "7.23"
+    titulo = "Masa disparada por un resorte sin fricción"
+    lista_datos = [
+        ("Masa:", r"m = 2.50\ \mathrm{kg}"),
+        ("Constante:", r"k = 25.0\ \mathrm{N/cm}"),
+        ("Energía almacenada:", r"U = 11.5\ \mathrm{J}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_linea(fig, "mesa", p(-3.4, -0.4), p(3.0, -0.4), color=self.MUTED, grosor=4)
+        self.f_linea(fig, "pared", p(-3.1, -0.4), p(-3.1, 1.6), color=self.MUTED, grosor=4)
+
+        def zig(p0, p1, vueltas=9, amp=0.14):
+            a = np.array(p0, dtype=float)
+            b = np.array(p1, dtype=float)
+            d = b - a
+            u = d / (np.linalg.norm(d) + 1e-9)
+            nn = np.array([-u[1], u[0], 0.0])
+            pts = [a]
+            N = 2 * vueltas
+            for i in range(1, N):
+                pts.append(a + d * (i / N) + nn * (amp if i % 2 else -amp))
+            pts.append(b)
+            return VMobject().set_points_as_corners(pts).set_color("#F4F7FB").set_stroke(width=4)
+
+        fig.registrar("resorte", zig(p(-3.1, 0.35), p(-1.7, 0.35)), lambda m: Create(m))
+        self.f_cuerpo(fig, "masa", p(-0.9, 0.0), ancho=1.1, alto=0.8,
+                      color=self.BLUE, etiqueta="masa")
+        self.f_vector(fig, "v", p(-0.35, 0.0), RIGHT, 1.2, color=self.CYAN,
+                      etiqueta=r"v", lado=UP, etiqueta_size=26)
+        self.f_vector(fig, "a", p(-2.4, 0.35), RIGHT, 1.0, color=self.RED,
+                      etiqueta=r"a", lado=UP, etiqueta_size=24)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "El resorte comprimido suelta a la masa",
+            "revelar": ["mesa", "pared", "resorte", "masa", "v"],
+            "text": ["Sin fricción y sin sujeción: la masa se despega al llegar a longitud natural."],
+        },
+        {
+            "titulo": "a) Rapidez máxima",
+            "math": [
+                r"\tfrac12 mv^2 = 11.5 \;\Rightarrow\; v = \sqrt{\dfrac{2(11.5)}{2.50}}",
+                r"v_{\max} = 3.03\ \mathrm{m/s}",
+            ],
+            "text": ["Ocurre al perder contacto, con el resorte en longitud natural."],
+            "resaltar": ["v"],
+        },
+        {
+            "titulo": "b) Aceleración máxima",
+            "revelar": ["a"],
+            "math": [
+                r"x = \sqrt{\dfrac{2(11.5)}{2500}} = 0.0959\ \mathrm{m}",
+                r"a = \dfrac{kx}{m} = \dfrac{(2500)(0.0959)}{2.50} = 95.9\ \mathrm{m/s^2}",
+            ],
+            "text": ["Ocurre al soltarla, con la compresión máxima."],
+            "resaltar": ["a"],
+        },
+    ]
+    resultado_latex = r"v_{\max} = 3.03\ \mathrm{m/s}, \qquad a_{\max} = 95.9\ \mathrm{m/s^2}"
+
+
+class P7_30(Cap7Scene):
+    numero = "7.30"
+    titulo = "Trabajo sobre tres trayectorias"
+    lista_datos = [
+        ("Fuerza:", r"\vec F = -\alpha x^2\,\hat\imath,\ \alpha = 12\ \mathrm{N/m^2}"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_ejes(fig, "ejes", p(-2.2, -1.6), largo_x=3.4, largo_y=2.6,
+                    etiqueta_x="x", etiqueta_y="y")
+        O = p(-2.2, -1.6)
+        A = O + p(0.8, 0.0)
+        B = O + p(0.8, 1.6)
+        C = O + p(2.4, 0.0)
+        for nombre, pos in [("pA", A), ("pB", B), ("pC", C)]:
+            self.f_cuerpo(fig, nombre, pos, forma="punto", color=self.WHITE)
+        self.f_texto(fig, "etA", "A", A + DOWN * 0.35 + LEFT * 0.1, size=22, color=self.WHITE)
+        self.f_texto(fig, "etB", "B", B + UP * 0.35, size=22, color=self.WHITE)
+        self.f_texto(fig, "etC", "C", C + DOWN * 0.35 + RIGHT * 0.1, size=22, color=self.WHITE)
+        self.f_vector(fig, "rAB", A, UP, 1.6, color=self.GREEN,
+                      etiqueta=None, grosor=5)
+        self.f_vector(fig, "rAC", A, RIGHT, 1.6, color=self.CYAN,
+                      etiqueta=None, grosor=5)
+        self.f_vector(fig, "rCA", C, LEFT, 1.6, color=self.YELLOW,
+                      etiqueta=None, grosor=5)
+        self.f_vector(fig, "fuerza", O + p(1.6, 0.9), LEFT, 1.2, color=self.RED,
+                      etiqueta=r"\vec F", lado=UP, etiqueta_size=24)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Tres caminos entre los mismos puntos",
+            "revelar": ["ejes", "pA", "etA", "pB", "etB", "pC", "etC", "fuerza"],
+            "text": ["La fuerza siempre apunta en −x y crece con x²."],
+        },
+        {
+            "titulo": "a) De A a B (vertical)",
+            "revelar": ["rAB"],
+            "math": [r"W = 0"],
+            "text": ["Fuerza perpendicular al desplazamiento en todo el tramo."],
+        },
+        {
+            "titulo": "b) De A a C (horizontal)",
+            "revelar": ["rAC"],
+            "math": [
+                r"W = \int_{0.10}^{0.30}\!-\alpha x^2\,dx = -\alpha\left[\dfrac{x^3}{3}\right]_{0.10}^{0.30}",
+                r"W = -0.104\ \mathrm{J}",
+            ],
+            "resaltar": ["rAC"],
+        },
+        {
+            "titulo": "c) De regreso y d) conclusión",
+            "revelar": ["rCA"],
+            "math": [
+                r"W_{C\to A} = +0.104\ \mathrm{J}",
+                r"W_{\text{ciclo}} = 0 \;\Rightarrow\; \text{conservativa}",
+            ],
+            "resaltar": ["rCA"],
+        },
+    ]
+    resultado_latex = r"W_{AB} = 0, \quad W_{AC} = -0.104\ \mathrm{J}, \quad \text{conservativa}"
+
+
+class P7_34(Cap7Scene):
+    numero = "7.34"
+    titulo = "Fuerza entre dos átomos de hidrógeno"
+    lista_datos = [
+        ("Energía potencial:", r"U(x) = -C_6/x^6"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        axes = self.f_grafica(
+            fig, "grafica", [lambda x: -1.0 / (x ** 6)],
+            x_range=[1.0, 3.0, 0.5], y_range=[-1.1, 0.1, 0.5],
+            x_label="x", y_label="U", ancho=4.4, alto=3.0, centro=(0.0, -0.2),
+        )
+        plot = fig.mob("grafica_c0")
+        y0 = -1.0 / (1.4 ** 6)
+        m = 6.0 / (1.4 ** 7)
+        tang = Line(axes.c2p(1.0, y0 - m * 0.4), axes.c2p(1.8, y0 + m * 0.4),
+                    color=self.YELLOW, stroke_width=3)
+        fig.registrar("tangente", tang, lambda m: Create(m))
+        self.f_vector(fig, "F", p(-1.8, -0.9), LEFT, 1.2, color=self.RED,
+                      etiqueta=r"F", lado=UP, etiqueta_size=26)
+        self.f_cuerpo(fig, "atomo", p(-1.0, -0.9), forma="punto", color=self.CYAN)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Energía negativa que tiende a cero",
+            "revelar": ["grafica_ejes", "grafica_c0", "atomo"],
+            "text": ["Lejos, U ≈ 0; cerca, U es muy negativa: conviene acercarse."],
+        },
+        {
+            "titulo": "La fuerza es menos la pendiente",
+            "revelar": ["tangente", "F"],
+            "math": [
+                r"F_x = -\dfrac{dU}{dx} = -\dfrac{d}{dx}\left(-\dfrac{C_6}{x^6}\right)",
+                r"F_x = -\dfrac{6C_6}{x^7}",
+            ],
+            "resaltar": ["tangente", "F"],
+        },
+        {
+            "titulo": "¿Atracción o repulsión?",
+            "math": [r"F_x < 0 \;\Rightarrow\; \text{hacia }x\text{ menor}"],
+            "text": ["Negativa: tira al átomo hacia su compañero. Es atracción."],
+        },
+    ]
+    resultado_latex = r"F_x = -\dfrac{6C_6}{x^7}\ < 0\ \text{(atractiva)}"
+
+
+class P7_36(Cap7Scene):
+    numero = "7.36"
+    titulo = "Fuerza desde U(x, y) en el plano"
+    lista_datos = [
+        ("Energía potencial:", r"U(x,y) = \alpha(1/x^2 + 1/y^2)"),
+    ]
+
+    def crear_figura(self):
+        fig = Figura()
+        self.f_ejes(fig, "ejes", p(-1.8, -1.6), largo_x=3.0, largo_y=2.8,
+                    etiqueta_x="x", etiqueta_y="y")
+        Q = p(0.2, 0.2)
+        self.f_cuerpo(fig, "punto", Q, forma="punto", color=self.YELLOW)
+        self.f_vector(fig, "Fx", Q, RIGHT, 1.3, color=self.CYAN,
+                      etiqueta=r"F_x", lado=DOWN, etiqueta_size=24)
+        self.f_vector(fig, "Fy", Q, UP, 1.1, color=self.GREEN,
+                      etiqueta=r"F_y", lado=RIGHT, etiqueta_size=24)
+        self.f_vector(fig, "F", Q, np.array([1.0, 0.85, 0.0]), 1.7,
+                      color=self.RED, etiqueta=r"\vec F", lado=UP, etiqueta_size=26)
+        return fig
+
+    pasos = [
+        {
+            "titulo": "Cada componente sale de una derivada parcial",
+            "revelar": ["ejes", "punto"],
+            "math": [r"F_x = -\dfrac{\partial U}{\partial x}, \qquad F_y = -\dfrac{\partial U}{\partial y}"],
+        },
+        {
+            "titulo": "Derivando término a término",
+            "revelar": ["Fx", "Fy"],
+            "math": [
+                r"F_x = -\alpha\dfrac{d}{dx}(x^{-2}) = \dfrac{2\alpha}{x^3}",
+                r"F_y = -\alpha\dfrac{d}{dy}(y^{-2}) = \dfrac{2\alpha}{y^3}",
+            ],
+            "resaltar": ["Fx", "Fy"],
+        },
+        {
+            "titulo": "Vector fuerza total",
+            "revelar": ["F"],
+            "math": [r"\vec F = \dfrac{2\alpha}{x^3}\,\hat\imath + \dfrac{2\alpha}{y^3}\,\hat\jmath"],
+            "resaltar": ["F"],
+        },
+    ]
+    resultado_latex = r"\vec F = \dfrac{2\alpha}{x^3}\,\hat\imath + \dfrac{2\alpha}{y^3}\,\hat\jmath"
